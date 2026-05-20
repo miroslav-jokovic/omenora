@@ -3,8 +3,23 @@ import { jsonSchemaOutputFormat } from '@anthropic-ai/sdk/helpers/json-schema'
 import { CalendarSchema, type CalendarType } from '~~/server/utils/ai-schemas'
 import { withAiRetry } from '~~/server/utils/ai-retry'
 import { getLanguageInstruction } from '~~/server/utils/language-instructions'
+import { requirePremiumOrEntitlement } from '~~/server/utils/entitlements'
 
+/**
+ * POST /api/generate-calendar
+ *
+ * Generates a 12-month lucky timing calendar for the authenticated user.
+ * Guarded by requirePremiumOrEntitlement — requires an active 'premium'
+ * subscription OR an active 'calendar_2026' entitlement (omenora_calendar_2026
+ * non-consumable IAP). Calendar is a permanent unlock; no usage cap applies.
+ */
 export default defineEventHandler(async (event) => {
+  await requirePremiumOrEntitlement(
+    event,
+    'calendar_2026',
+    ['omenora_monthly', 'omenora_annual', 'omenora_calendar_2026'],
+  )
+
   const config = useRuntimeConfig()
 
   const body = await readBody(event)
