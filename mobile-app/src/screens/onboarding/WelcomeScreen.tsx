@@ -19,6 +19,7 @@ import {
   space,
   layout,
   fontFamily,
+  typeScale,
 } from '../../design/tokens'
 import { AtmosphericBackground } from '../../components/atmosphere'
 import { Text } from '../../components/atoms/Text'
@@ -99,7 +100,7 @@ export default function WelcomeScreen() {
           style={styles.topBar}
         >
           <Image
-            source={require('../../../assets/icon.png')}
+            source={require('../../../assets/logomark.png')}
             style={styles.logoMark}
             resizeMode="contain"
             accessibilityLabel="Omenora"
@@ -113,7 +114,7 @@ export default function WelcomeScreen() {
             animate={WELCOME_HEADLINE_ANIMATE}
             transition={WELCOME_HEADLINE_TRANSITION}
           >
-            <Text variant="micro" color="tertiary" style={styles.eyebrow}>
+            <Text variant="eyebrow" color="tertiary" style={styles.eyebrow}>
               An invitation
             </Text>
             <Text variant="display1" color="primary" style={styles.headline}>
@@ -121,7 +122,7 @@ export default function WelcomeScreen() {
               <Text
                 variant="display1"
                 color="primary"
-                style={styles.headlineItalic}
+                style={styles.headlineEmphasis}
               >
                 born
               </Text>
@@ -136,7 +137,7 @@ export default function WelcomeScreen() {
             animate={WELCOME_SUBHEAD_ANIMATE}
             transition={WELCOME_SUBHEAD_TRANSITION}
           >
-            <Text variant="bodyLarge" color="secondary" style={styles.subheadline}>
+            <Text variant="lede" color="secondary" style={styles.subheadline}>
               Your birth, your hour, your hemisphere — the reading is shaped only by what is true for you.
             </Text>
           </MotiView>
@@ -208,54 +209,51 @@ export default function WelcomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex:            1,
-    backgroundColor: surface.base,
+    backgroundColor: surface.deep,  // deepest tone — matches atmosphere base
   },
   safe: {
     flex:              1,
     paddingHorizontal: layout.screenPadding,
   },
   topBar: {
-    paddingTop:  space['5'],
+    paddingTop:  space['8'],        // 32px — generous masthead breathing room
     alignItems:  'center',
   },
   logoMark: {
-    width:  32,
-    height: 32,
-    opacity: 0.90,
+    width:  52,
+    height: 52,
   },
   headlineZone: {
     flex:              1,
-    paddingTop:        space['16'],
-    paddingHorizontal: space['4'],
+    paddingTop:        space['10'], // 40px — headline sits in upper third
+    paddingHorizontal: space['2'],  // 8px extra inset on top of screenPadding
+    justifyContent:    'flex-start',
   },
   eyebrow: {
-    letterSpacing: 4,
-    marginBottom:  space['4'],
-    textAlign:     'center',
+    // letterSpacing comes from typeScale.eyebrow (tracking.caps = 2.0)
+    marginBottom: space['3'],
+    textAlign:    'center',
   },
   headline: {
-    letterSpacing: -0.5,
-    textAlign:     'center',
+    // letterSpacing comes from typeScale.display1 (tracking.snug = -1.0) — no override
+    textAlign: 'center',
   },
-  // Intentional override: applies displayItalic family at display1 size (40pt)
-  // for single-word italic emphasis ("born"). No display1Italic variant exists
-  // because this is the only consumer. If a second consumer appears, add
-  // display1Italic to typeScale instead of duplicating this override.
-  headlineItalic: {
+  // Weight-contrast emphasis on "born" — Onest 500 Medium over 300 Light base.
+  // Renamed from headlineItalic (stale) to headlineEmphasis.
+  headlineEmphasis: {
+    ...typeScale.display1,
     fontFamily: fontFamily.displayMedium,
-    textAlign:  'center',
   },
   bottomZone: {
-    paddingBottom: space['4'],
+    paddingBottom: space['6'],       // 24px — safe area already covers system bar
   },
   subheadline: {
-    marginBottom:      space['8'],
-    paddingHorizontal: space['4'],
-    textAlign:         'center',
+    marginBottom: space['8'],        // 32px separation before CTA
+    textAlign:    'center',          // no extra paddingHorizontal — screenPadding is sufficient
   },
   actions: {
     gap:          space['3'],
-    marginBottom: space['5'],
+    marginBottom: space['4'],
   },
   signInTap: {
     flexDirection:  'row',

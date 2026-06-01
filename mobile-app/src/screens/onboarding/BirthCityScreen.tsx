@@ -65,10 +65,10 @@ export default function BirthCityScreen() {
             transition={CITY_HEADER_TRANSITION}
             style={styles.header}
           >
-            <Text variant="micro" color="secondary" style={styles.eyebrow}>
+            <Text variant="eyebrow" color="secondary" style={styles.eyebrow}>
               YOUR PLACE
             </Text>
-            <Text variant="display1" color="primary" style={styles.headline}>
+            <Text variant="heading1" color="primary" style={styles.headline}>
               Where were you born?
             </Text>
             <Text variant="readingBody" color="secondary" style={styles.support}>
@@ -113,7 +113,7 @@ export default function BirthCityScreen() {
 const styles = StyleSheet.create({
   root: {
     flex:            1,
-    backgroundColor: surface.base,
+    backgroundColor: surface.deep,
   },
   flex: {
     flex: 1,
@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
     gap: space['3'],
   },
   eyebrow: {
-    letterSpacing: 2.5,
+    // letterSpacing provided by typeScale.eyebrow (tracking.caps)
   },
   headline: {
     marginTop: space['1'],

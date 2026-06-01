@@ -94,5 +94,25 @@ export const decor = {
   },
 } as const
 
-export const tokens = { surface, text, accent, cta, border, state, specialty, gradient, decor } as const
+// ── Atmosphere glow opacities — all radial glow stopOpacity values ────────────
+// Tuned for cool charcoal canvas (surface.deep #121214).
+// Every value here replaces a hardcoded string literal in AtmosphericBackground.
+// Grouped by glow layer role so they can be adjusted as a system.
+export const atmosphere = {
+  // Primary radial glow — uses GLOW_STOPS per variant
+  hero:    { center: 0.45, mid: 0.18, outer: 0.05 },  // WelcomeScreen + onboarding hero moments
+  default: { center: 0.22, mid: 0.09, outer: 0.02 },  // Standard tab screens
+  muted:   { center: 0.10, mid: 0.04, outer: 0.01 },  // Info-dense screens
+
+  // Counter glow — always bronze, sits at bottom-center opposite primary
+  counter: { center: 0.14, mid: 0.05 },
+
+  // CTA light pool — wide soft ellipse at 82% screen height behind CTA button
+  ctaPool: { center: 0.18, mid: 0.06 },
+
+  // Button halo — tight bright ellipse immediately surrounding the CTA
+  halo: { center: 0.30, mid: 0.10 },
+} as const
+
+export const tokens = { surface, text, accent, cta, border, state, specialty, gradient, decor, atmosphere } as const
 export type DesignTokens = typeof tokens
