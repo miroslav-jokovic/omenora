@@ -99,19 +99,24 @@ export const decor = {
 // Every value here replaces a hardcoded string literal in AtmosphericBackground.
 // Grouped by glow layer role so they can be adjusted as a system.
 export const atmosphere = {
-  // Primary radial glow — uses GLOW_STOPS per variant
-  hero:    { center: 0.45, mid: 0.18, outer: 0.05 },  // WelcomeScreen + onboarding hero moments
-  default: { center: 0.22, mid: 0.09, outer: 0.02 },  // Standard tab screens
-  muted:   { center: 0.10, mid: 0.04, outer: 0.01 },  // Info-dense screens
+  // Glow color — neutral white, NOT bronze/accent.
+  // Premium dark apps use white radial glows at very low opacity for ambient
+  // light. Bronze (#A87D4E) is a type/border accent, not a light source color.
+  glowColor: '#FFFFFF',
 
-  // Counter glow — always bronze, sits at bottom-center opposite primary
-  counter: { center: 0.14, mid: 0.05 },
+  // Primary radial glow opacity stops — white at these opacities on #121214
+  hero:    { center: 0.10, mid: 0.04, outer: 0.01 },  // WelcomeScreen + hero moments
+  default: { center: 0.07, mid: 0.03, outer: 0.00 },  // Standard tab screens
+  muted:   { center: 0.03, mid: 0.01, outer: 0.00 },  // Info-dense screens
 
-  // CTA light pool — wide soft ellipse at 82% screen height behind CTA button
-  ctaPool: { center: 0.18, mid: 0.06 },
+  // Counter glow — neutral white, bottom-center
+  counter: { center: 0.05, mid: 0.02 },
 
-  // Button halo — tight bright ellipse immediately surrounding the CTA
-  halo: { center: 0.30, mid: 0.10 },
+  // CTA light pool
+  ctaPool: { center: 0.07, mid: 0.02 },
+
+  // Button halo
+  halo: { center: 0.12, mid: 0.04 },
 } as const
 
 export const tokens = { surface, text, accent, cta, border, state, specialty, gradient, decor, atmosphere } as const

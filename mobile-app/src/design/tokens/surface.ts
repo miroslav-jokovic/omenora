@@ -3,27 +3,26 @@
 // Aligned to web design system: cool charcoal canvas, tonal lift hierarchy.
 // Borders use surface-matched solid values (not opacity-white).
 
-export const surfaceCanvas = '#252528'         // screen background — matches surface.base (web: --omn-bg-primary)
+export const surfaceCanvas = '#121214'         // screen background — matches surface.deep
 
 // ── Card semantic surfaces — solid, charcoal family ────────────────────────
 // Hierarchy is controlled by luminance step within the charcoal family.
-// Canvas (#252528) bleeds through transparent cards uniformly.
 export const surfaceCardContent  = '#2F2F33'   // one step above canvas (web: --omn-bg-elevated)
 export const surfaceCardElevated = '#3A3A3F'   // two steps above canvas (web: --omn-bg-interactive)
 export const surfaceCardLocked   = '#2F2F33'   // mirrors content — no visual emphasis
 
 // ── Card semantic surfaces — gradient (two stops, top→bottom) ────────────────
-// Premium: bronze-lit top, charcoal base — warm editorial register
-export const surfaceCardPremiumGlowTop = '#3D3530'   // bronze-warmed charcoal top highlight
-export const surfaceCardPremiumBase    = '#2F2F33'   // matches surfaceCardContent at base
+// Premium: pure charcoal lift — top is slightly lighter than base, no warm tones
+export const surfaceCardPremiumGlowTop = '#3A3A3F'   // cool charcoal elevated top
+export const surfaceCardPremiumBase    = '#252528'   // cool charcoal base
 
-// Accent rust: warm burnt-orange gradient — stat/conversion moments
+// Accent rust: warm burnt-orange gradient — intentional CTA/conversion moments only
 export const surfaceCardAccentRustTop    = '#C25A2E'
 export const surfaceCardAccentRustBottom = '#9A4520'
 
-// Featured: warm copper — ad-hoc featured moments only (e.g. "Annual Forecast")
-export const surfaceCardFeaturedTop    = '#A87D4E'   // uses exact accent.primary value
-export const surfaceCardFeaturedBottom = '#5A3A22'
+// Featured: cool elevated charcoal — no orange/copper, subtle tonal lift only
+export const surfaceCardFeaturedTop    = '#3A3A3F'   // matches elevated surface
+export const surfaceCardFeaturedBottom = '#252528'   // matches base surface
 
 // ── Tier 3: Component tokens ──────────────────────────────────────────────────
 // Consumed directly by Card.tsx variantConfig.
@@ -46,7 +45,7 @@ export const cardTokens = {
     content:  '#3A3A3F',  // surface-matched solid — matches surface.overlay
     elevated: '#4A4A50',  // one step stronger — matches surface.floating
     locked:   'transparent',
-    premium:  'rgba(168,125,78,0.18)',  // faint bronze edge on premium gradient cards
+    premium:  'rgba(242,237,229,0.08)',  // near-invisible warm cream hairline on premium cards
     accentRust: 'transparent',
     featured:   'transparent',
   },
