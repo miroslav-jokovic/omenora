@@ -4,7 +4,7 @@ import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { Text } from '../../components/atoms'
 import { ErrorState, ScreenWrapper } from '../../components/templates'
-import { PhoenixLoader } from '../../components/atoms/PhoenixLoader'
+import { OmenLoader } from '../../components/atoms/OmenLoader'
 import { useProfileStore } from '../../stores/profileStore'
 import { useAuth } from '../../context/useAuth'
 import { saveProfile, ProfileSaveError } from '../../services/profileService'
@@ -213,8 +213,8 @@ export default function CalculatingScreen() {
   return (
     <View style={styles.container}>
       <AtmosphericBackground variant="hero" glowPosition="top-center" grain />
-      <PhoenixLoader size={80} />
-      <Text variant="displayItalic" style={styles.label}>
+      <OmenLoader size={80} />
+      <Text variant="display2" style={styles.label}>
         {savePhase === 'saving' ? 'Saving your profile…' : LOADING_PHRASES[phraseIndex]}
       </Text>
       {savePhase === 'save-error' && saveErrorMsg && (

@@ -11,6 +11,7 @@ import * as Haptics from 'expo-haptics'
 import type { LucideIcon } from 'lucide-react-native'
 import {
   tokens,
+  cta as ctaTokens,
   space,
   layout,
   radius,
@@ -18,7 +19,7 @@ import {
 } from '../../design/tokens'
 import { Text } from './Text'
 
-export type ButtonVariant = 'primary' | 'secondary' | 'tertiary' | 'danger' | 'premium'
+export type ButtonVariant = 'primary' | 'secondary' | 'tertiary' | 'danger' | 'premium' | 'cta'
 
 export interface ButtonProps {
   label: string
@@ -51,6 +52,11 @@ const variantStyles = {
     container: { backgroundColor: tokens.state.danger, borderWidth: 0 },
     label:     { color: tokens.specialty.white },
     indicator:  tokens.specialty.white,
+  },
+  cta: {
+    container: { backgroundColor: ctaTokens.primary, borderWidth: 0 },
+    label:     { color: ctaTokens.text },
+    indicator:  ctaTokens.text,
   },
 } as const
 
@@ -110,7 +116,7 @@ export const Button: React.FC<ButtonProps> = ({
 }) => {
   const handlePress = () => {
     if (disabled || loading) return
-    if (variant === 'primary' || variant === 'secondary' || variant === 'premium') {
+    if (variant === 'primary' || variant === 'secondary' || variant === 'premium' || variant === 'cta') {
       Haptics.selectionAsync()
     }
     onPress()

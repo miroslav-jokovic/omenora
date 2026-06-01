@@ -15,20 +15,15 @@ import { RootNavigator, navigationRef } from './src/navigation/RootNavigator';
 import { useProfileStore } from './src/stores/profileStore';
 import {
   useFonts,
-  CormorantGaramond_300Light,
-  CormorantGaramond_300Light_Italic,
-  CormorantGaramond_500Medium,
-} from '@expo-google-fonts/cormorant-garamond';
+  Onest_300Light,
+  Onest_400Regular,
+  Onest_500Medium,
+  Onest_600SemiBold,
+} from '@expo-google-fonts/onest';
 import {
-  Fraunces_300Light,
-  Fraunces_300Light_Italic,
-  Fraunces_500Medium,
-} from '@expo-google-fonts/fraunces';
-import {
-  Poppins_400Regular,
-  Poppins_500Medium,
-  Poppins_600SemiBold,
-} from '@expo-google-fonts/poppins';
+  GeistMono_400Regular,
+  GeistMono_500Medium,
+} from '@expo-google-fonts/geist-mono';
 
 // Keep splash screen visible while loading
 SplashScreen.preventAutoHideAsync();
@@ -104,15 +99,12 @@ function App() {
   const initializeStore = useProfileStore((state) => state.initialize);
 
   const [fontsLoaded] = useFonts({
-    CormorantGaramond_300Light,
-    CormorantGaramond_300Light_Italic,
-    CormorantGaramond_500Medium,
-    Fraunces_300Light,
-    Fraunces_300Light_Italic,
-    Fraunces_500Medium,
-    Poppins_400Regular,
-    Poppins_500Medium,
-    Poppins_600SemiBold,
+    Onest_300Light,
+    Onest_400Regular,
+    Onest_500Medium,
+    Onest_600SemiBold,
+    GeistMono_400Regular,
+    GeistMono_500Medium,
   });
 
   useEffect(() => {

@@ -6,9 +6,9 @@ import React from 'react'
 import { Dimensions, StyleSheet, View } from 'react-native'
 import { LinearGradient } from 'expo-linear-gradient'
 import Svg, { Circle, Defs, Rect, RadialGradient, Stop } from 'react-native-svg'
-import BackgroundGraph from '../../../assets/Background-Graph.svg'
+import Decor from './Decor'
 
-import { accent, surface } from '../../design/tokens'
+import { accent, surface, decor } from '../../design/tokens'
 
 export interface AtmosphericBackgroundProps {
   /**
@@ -25,7 +25,7 @@ export interface AtmosphericBackgroundProps {
   ctaLightPool?:   boolean   // dedicated warm light pool sized to sit behind a CTA in the lower third
   buttonHalo?:     boolean   // tight warm halo positioned at lower-third center — sit a CTA in this for "lit object" effect
   grain?:          boolean
-  graphicOverlay?: boolean   // renders the Background-Graph.svg as a blended decorative layer
+  graphicOverlay?: boolean   // renders the generative guilloché wave lattice (<Decor>) as a blended decorative layer
   vignette?:       'none' | 'bottom' | 'top'
   children?:       React.ReactNode
 }
@@ -43,7 +43,7 @@ const NOISE = (() => {
     seed = (seed * 1664525 + 1013904223) & 0x7fffffff
     const cy = seed % SCREEN_H
     seed = (seed * 1664525 + 1013904223) & 0x7fffffff
-    out.push({ cx, cy, r: 0.7, opacity: 0.018 + ((seed % 10) / 10) * 0.032 })
+    out.push({ cx, cy, r: 0.7, opacity: decor.grain.min + ((seed % 10) / 10) * (decor.grain.max - decor.grain.min) })
   }
   return out
 })()
@@ -127,17 +127,15 @@ export default function AtmosphericBackground({
           style={StyleSheet.absoluteFill}
         />
 
-        {/* Layer 1b — Decorative graphic overlay (standard: always on; manual: opt-in) */}
-        {resolvedGraphic && typeof BackgroundGraph === 'function' && (
-          <View style={styles.graphicOverlay} pointerEvents="none">
-            <BackgroundGraph
-              width={SCREEN_W}
-              height={SCREEN_H}
-              style={styles.graphicSvg}
-              preserveAspectRatio="xMidYMid meet"
-              color="#ffffff"
-            />
-          </View>
+        {/* Layer 1b — Generative guilloché wave lattice (standard: always on; manual: opt-in) */}
+        {resolvedGraphic && (
+          <Decor
+            pattern="wave"
+            tone="gold"
+            intensity="watermark"
+            width={SCREEN_W}
+            height={SCREEN_H}
+          />
         )}
 
         {/* Layers 2–4 — Radial glows + optional grain via SVG */}
@@ -272,16 +270,6 @@ export default function AtmosphericBackground({
 }
 
 const styles = StyleSheet.create({
-  graphicOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    opacity:        0.06,
-    alignItems:     'center',
-    justifyContent: 'center',
-  },
-  graphicSvg: {
-    width:  SCREEN_W,
-    height: SCREEN_H,
-  },
   vignette: {
     position: 'absolute',
     left:     0,

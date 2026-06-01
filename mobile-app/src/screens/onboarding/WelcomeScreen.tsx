@@ -242,7 +242,7 @@ const styles = StyleSheet.create({
   // because this is the only consumer. If a second consumer appears, add
   // display1Italic to typeScale instead of duplicating this override.
   headlineItalic: {
-    fontFamily: fontFamily.displayItalic,
+    fontFamily: fontFamily.displayMedium,
     textAlign:  'center',
   },
   bottomZone: {

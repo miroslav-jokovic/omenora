@@ -8,12 +8,14 @@ export const space = {
 } as const
 
 export const layout = {
-  screenPadding:        20,
+  screenPadding:        20,   // HIG standard side margin
   cardPaddingCompact:   16,
   cardPaddingDefault:   20,
-  cardPaddingPremium:   28,  // Cluster 15a: increased from 24 for premium hero card breathing room
-  cardGap:              16,  // Cluster 15a: increased from 12 for inter-card breathing room
-  sectionGap:           32,
-  tapTarget:            44,
-  bottomFloatPosition:  60,  // Cluster 16b: absolute bottom offset for floating error/retry zones (CalculatingScreen, SplashScreen)
+  cardPaddingPremium:   28,
+  cardGap:              16,   // inter-card breathing room
+  cardContentGap:       12,   // internal card content-row gap (icon + text, key-value rows)
+  sectionGap:           32,   // between major content blocks
+  sectionHeaderGap:     48,   // between section eyebrow/title and first content card
+  tapTarget:            44,   // HIG minimum tap target
+  bottomFloatPosition:  60,   // absolute bottom offset for floating zones
 } as const

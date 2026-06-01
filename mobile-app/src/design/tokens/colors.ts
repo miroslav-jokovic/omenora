@@ -1,80 +1,98 @@
 export const surface = {
-  deep:    '#0A0604',
-  base:    '#15110D',  // Cluster 15a-fix: warmer near-black per reference palette (was #120D08)
-  raised:  '#1A130C',
-  overlay: '#221A12',
-  floating:'#2A2218',
-  inverse: '#F5F0E8',
-  // New primitives — Cluster 15a
-  brown450: '#312818',  // reserved for 15b hero variant — not consumed as card token in 15a
-  brown400: '#3A2F1C',  // reserved for 15b hero variant — not consumed as card token in 15a
-  purple700:'#3A2A5A',  // deep mystical purple — consumed by surface.card.premium (surface.ts)
+  deep:    '#121214',  // page foundation — deepest tone (web: --omn-bg-page)
+  base:    '#252528',  // dominant atmosphere, most surfaces (web: --omn-bg-primary)
+  raised:  '#2F2F33',  // cards, modals (web: --omn-bg-elevated)
+  overlay: '#3A3A3F',  // hover, selected, dropdowns (web: --omn-bg-interactive)
+  floating:'#4A4A50',  // focused inputs, selected states (web: --omn-border-emphasis)
+  inverse: '#F2EDE5',  // warm cream — matches text.primary for inverse surfaces
 } as const
 
 export const text = {
-  primary:   'rgba(255,255,255,0.93)',
-  secondary: 'rgba(255,255,255,0.68)',
-  tertiary:  'rgba(255,255,255,0.45)',
-  disabled:  'rgba(255,255,255,0.30)',
-  inverse:   '#15110D',  // matches surface.base
-  accent:    '#C9A961',
+  primary:   '#F2EDE5',  // warm cream (web: --omn-text-primary)
+  secondary: '#A8A19A',  // warm taupe (web: --omn-text-secondary)
+  tertiary:  '#6B655E',  // warm brown (web: --omn-text-tertiary)
+  disabled:  '#4A4A50',  // matches surface.floating — softest readable state
+  inverse:   '#121214',  // page-color for text on light/CTA surfaces
+  accent:    '#A87D4E',  // bronze — matches accent.primary for inline accent text
 } as const
 
 export const accent = {
-  primary:  '#C9A961',
-  emphasis: '#E0C078',
-  subtle:   'rgba(201,169,97,0.10)',
-  muted:    'rgba(201,169,97,0.04)',
+  primary:  '#A87D4E',  // aged bronze (web: --omn-accent)
+  quiet:    '#6E5536',  // hover state, subtle bronze borders (web: --omn-accent-quiet)
+  subtle:   'rgba(168,125,78,0.10)',
+  muted:    'rgba(168,125,78,0.04)',
+} as const
+
+// ── CTA — primary purchase actions only ──────────────────────────────────────
+// Reserved exclusively for primary purchase CTAs (web: --omn-cta family).
+// Never use for secondary actions, nav links, or decorative elements.
+export const cta = {
+  primary:  '#E8763A',  // warm burnt orange (web: --omn-cta)
+  active:   '#FF8856',  // brightened ~10% for pressed/active state (web: --omn-cta-hover)
+  text:     '#121214',  // page-color for maximum contrast on CTA button
 } as const
 
 export const border = {
-  subtle:  'rgba(255,255,255,0.06)',
-  default: 'rgba(255,255,255,0.10)',
-  strong:  'rgba(255,255,255,0.18)',
-  accent:  'rgba(201,169,97,0.40)',
-  hairline:'rgba(255,255,255,0.04)',
-  gold:    'rgba(201,169,97,0.22)',
+  subtle:   '#2F2F33',  // table rows, secondary dividers — matches surface.raised (web: --omn-border-subtle)
+  default:  '#3A3A3F',  // cards, buttons, primary dividers (web: --omn-border-primary)
+  strong:   '#4A4A50',  // focused inputs, selected states (web: --omn-border-emphasis)
+  accent:   'rgba(168,125,78,0.40)',  // bronze accent border
+  hairline: 'rgba(242,237,229,0.06)', // near-invisible structural line on dark surfaces
+  gold:     'rgba(168,125,78,0.22)',  // decorative gold rule (dinkus, dividers)
 } as const
 
 export const state = {
-  success: '#5EBE8A',
-  warning: '#D9A24A',
-  danger:  '#E07D7D',
-  info:    '#7AA0E0',
+  success: '#7B9472',  // muted sage (web: --omn-success)
+  warning: '#D9A24A',  // amber — unchanged
+  danger:  '#D14B3D',  // validation red (web: --omn-error)
+  info:    '#7AA0E0',  // informational blue — unchanged
 } as const
 
 export const specialty = {
-  lockScrim:      'rgba(5,4,16,0.65)',
-  /** @deprecated Cluster 15a — LockedCard no longer uses absoluteFill scrim. Remove in 15b. */
-  lockScrimLight: 'rgba(8,10,22,0.50)',
-  /** @deprecated Cluster 15a — lockBlur unused after BlurView removal. Remove in 15b. */
-  lockBlur:       40,
-  chatUser:     '#13122A',
-  chatCounsel:  'rgba(201,169,97,0.10)',
-  glassTint:    'rgba(255,255,255,0.10)',
-  white:        '#FFFFFF',
-  overlayScrim: 'rgba(0,0,0,0.60)',
-  // Cluster 16b: semantic surface tint for stale forecast content
-  forecastStaleSurface: 'rgba(194, 136, 64, 0.12)',
-  // Card frosted-glass tokens — DEPRECATED Cluster 15a. Replaced by surface.ts cardTokens. Remove in 15b.
-  /** @deprecated Use cardTokens.background.default from surface.ts. Remove in 15b. */
-  cardBlurIntensity:   22,
-  /** @deprecated Use cardTokens.background.default from surface.ts. Remove in 15b. */
-  cardTintDefault:     'rgba(30,40,80,0.28)',
-  /** @deprecated Use cardTokens.background.elevated from surface.ts. Remove in 15b. */
-  cardTintRaised:      'rgba(30,40,80,0.38)',
-  /** @deprecated Use cardTokens.background.premium from surface.ts. Remove in 15b. */
-  cardTintPremium:     'rgba(28,36,72,0.42)',
-  /** @deprecated Use cardTokens.background.locked from surface.ts. Remove in 15b. */
-  cardTintGlass:       'rgba(20,30,70,0.18)',
-  // Cluster 17c: hero image overlay gradient — warm-black scrim (opaque and transparent ends)
-  heroScrim:            'rgba(21, 17, 13, 1.0)',
-  heroScrimTransparent: 'rgba(10, 6, 4, 0)',
+  lockScrim:            'rgba(18,18,20,0.65)',
+  chatUser:             '#1E1E21',
+  chatCounsel:          'rgba(168,125,78,0.10)',
+  glassTint:            'rgba(255,255,255,0.05)',
+  white:                '#FFFFFF',
+  overlayScrim:         'rgba(0,0,0,0.60)',
+  forecastStaleSurface: 'rgba(168,125,78,0.12)',
+  heroScrim:            'rgba(18,18,20,1.0)',
+  heroScrimTransparent: 'rgba(18,18,20,0)',
 } as const
 
 export const gradient = {
-  cardGlass: ['#201710', '#16100A'] as const,
+  cardBase: ['#1E1E21', '#121214'] as const,
 } as const
 
-export const tokens = { surface, text, accent, border, state, specialty, gradient } as const
+// ── Decor — generative guilloché line-work ────────────────────────────────────
+// Drives the procedural <Decor> engine (engine-turned rosettes, wave lattices,
+// concentric rings). Token-only: opacity tiers, stroke fineness, brand tones,
+// and film-grain range.
+export const decor = {
+  // Whole-layer opacity for decorative line-work. Kept deliberately faint —
+  // atmosphere, not ornament. Never exceed `presence`.
+  opacity: {
+    watermark: 0.05,  // full-screen backgrounds & quiet card watermarks
+    subtle:    0.08,  // focal content cards
+    presence:  0.12,  // premium hero moments only
+  },
+  // Stroke tones. `bronze` is the brand signature; `light` lifts decor off
+  // surfaces where bronze would disappear.
+  tone: {
+    gold:  accent.primary,  // #A87D4E — bronze, kept as 'gold' key for Decor engine compatibility
+    light: '#FFFFFF',
+  },
+  // Hairline stroke widths (px) — currency-engraving fineness.
+  stroke: {
+    hairline: 0.75,
+    fine:     1,
+  },
+  // Film-grain noise opacity range — paper-stock texture over the atmosphere.
+  grain: {
+    min: 0.018,
+    max: 0.05,
+  },
+} as const
+
+export const tokens = { surface, text, accent, cta, border, state, specialty, gradient, decor } as const
 export type DesignTokens = typeof tokens

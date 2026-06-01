@@ -33,4 +33,4 @@ export type { ArchetypeIconProps } from './ArchetypeIcon'
 export { DimensionIcon } from './DimensionIcon'
 export type { DimensionIconProps } from './DimensionIcon'
 
-export { PhoenixLoader } from './PhoenixLoader'
+export { OmenLoader } from './OmenLoader'

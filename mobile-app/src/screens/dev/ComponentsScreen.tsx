@@ -45,7 +45,10 @@ import {
   ErrorState,
 } from '../../components/templates'
 
-import { space, layout, tokens } from '../../design/tokens'
+import { Decor } from '../../components/atmosphere'
+import type { DecorPattern, DecorTone } from '../../components/atmosphere'
+
+import { space, layout, radius, tokens } from '../../design/tokens'
 
 const Row: React.FC<{ label: string; children: React.ReactNode }> = ({ label, children }) => (
   <View style={{ marginBottom: space['5'] }}>
@@ -53,6 +56,17 @@ const Row: React.FC<{ label: string; children: React.ReactNode }> = ({ label, ch
     {children}
   </View>
 )
+
+// Fixed-size swatch for previewing a Decor pattern on device.
+const DecorTile: React.FC<{ pattern: DecorPattern; tone: DecorTone; bg: string }> = ({ pattern, tone, bg }) => {
+  const W = 320
+  const H = 132
+  return (
+    <View style={{ width: W, height: H, borderRadius: radius.lg, overflow: 'hidden', backgroundColor: bg, marginBottom: space['3'] }}>
+      <Decor pattern={pattern} tone={tone} intensity="presence" width={W} height={H} />
+    </View>
+  )
+}
 
 export const ComponentsScreen: React.FC = () => {
   const navigation = useNavigation()
@@ -83,6 +97,22 @@ export const ComponentsScreen: React.FC = () => {
       <Text variant="body" color="secondary" style={{ marginTop: space['2'], marginBottom: space['8'] }}>
         Design system preview — dev only.
       </Text>
+
+      {/* DECOR — generative guilloché (intensity bumped to 'presence' for visibility) */}
+      <SectionHeader title="Decor — guilloché engine" rule />
+
+      <Row label="rosette — gold on cosmic (premium / accent-navy cards)">
+        <DecorTile pattern="rosette" tone="gold" bg={tokens.surface.deep} />
+      </Row>
+      <Row label="rosette — light on copper (featured / accent-rust cards)">
+        <DecorTile pattern="rosette" tone="light" bg="#5A3A22" />
+      </Row>
+      <Row label="wave — gold lattice (screen backgrounds)">
+        <DecorTile pattern="wave" tone="gold" bg={tokens.surface.base} />
+      </Row>
+      <Row label="rings — gold (alternate background option)">
+        <DecorTile pattern="rings" tone="gold" bg={tokens.surface.base} />
+      </Row>
 
       {/* ATOMS */}
       <SectionHeader title="Atoms" rule />

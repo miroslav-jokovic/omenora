@@ -1,42 +1,42 @@
 import React, { useState } from 'react'
 import { View, StyleSheet, ViewStyle, LayoutChangeEvent } from 'react-native'
 import { LinearGradient } from 'expo-linear-gradient'
-import { BlurView } from 'expo-blur'
-import CardGraph from '../../../assets/svg-bg/Card-Graph.svg'
-import { cardTokens, radius, layout, tokens } from '../../design/tokens'
+import Decor, { DecorTone } from '../atmosphere/Decor'
+import { cardTokens, radius, layout } from '../../design/tokens'
 
 export interface CardProps {
   /**
    * Visual tier of the card surface:
-   * - content      — solid #18172A, hairline border, content list cards
-   * - elevated     — solid #1F1E33, hairline border, featured content (DailyCard)
-   * - premium      — cosmic deep blue-violet gradient #2E2B5F→#14152A, spotlight from top center
-   * - featured     — warm copper gradient #A87850→#5A3A22, ad-hoc featured moments only
-   * - accent-navy  — vertical gradient deep navy #2A2F5A→#1E2245
-   * - accent-rust  — vertical gradient warm rust #C25A2E→#9A4520
-   * - locked       — solid #18172A, no border
+   * - content     — solid charcoal #2F2F33, hairline border, content list cards
+   * - elevated    — solid charcoal #3A3A3F, stronger border, featured content
+   * - premium     — bronze-lit charcoal gradient, faint bronze border
+   * - featured    — warm copper gradient #A87D4E→#5A3A22, ad-hoc featured moments only
+   * - accent-rust — vertical gradient warm rust #C25A2E→#9A4520, conversion moments
+   * - locked      — solid charcoal #2F2F33, no border
    *
-   * Deprecated aliases (render as nearest new variant, remove in 15b):
+   * Deprecated aliases (render as nearest variant):
    * - default → content
    * - raised  → elevated
    * - glass   → content
    * - accent  → accent-rust
+   * - accent-navy → premium  (navy/purple removed per design system §8)
    */
-  variant?: 'content' | 'elevated' | 'premium' | 'featured' | 'accent-navy' | 'accent-rust' | 'locked'
-    | 'default' | 'raised' | 'glass' | 'accent'
+  variant?: 'content' | 'elevated' | 'premium' | 'featured' | 'accent-rust' | 'locked'
+    | 'default' | 'raised' | 'glass' | 'accent' | 'accent-navy'
   padding?: 'compact' | 'default' | 'premium'
   children: React.ReactNode
   style?: ViewStyle
 }
 
 // Resolve deprecated variant aliases to canonical names
-function resolveVariant(v: NonNullable<CardProps['variant']>): 'content' | 'elevated' | 'premium' | 'featured' | 'accent-navy' | 'accent-rust' | 'locked' {
+function resolveVariant(v: NonNullable<CardProps['variant']>): 'content' | 'elevated' | 'premium' | 'featured' | 'accent-rust' | 'locked' {
   switch (v) {
-    case 'default': return 'content'   // @deprecated
-    case 'raised':  return 'elevated'  // @deprecated
-    case 'glass':   return 'content'   // @deprecated
-    case 'accent':  return 'accent-rust' // @deprecated
-    default:        return v
+    case 'default':     return 'content'
+    case 'raised':      return 'elevated'
+    case 'glass':       return 'content'
+    case 'accent':      return 'accent-rust'
+    case 'accent-navy': return 'premium'   // navy/purple replaced by bronze-charcoal premium
+    default:            return v
   }
 }
 
@@ -85,13 +85,11 @@ type GradientConfigFull = GradientConfig & {
   end:   { x: number; y: number }
 }
 
-const gradientConfig: Record<'premium' | 'featured' | 'accent-navy' | 'accent-rust', GradientConfigFull> = {
+const gradientConfig: Record<'premium' | 'featured' | 'accent-rust', GradientConfigFull> = {
   premium: {
     kind:         'gradient',
     colors:       cardTokens.background.premiumGradient,
     borderRadius: radius.lg,
-    // Spotlight from top-center: slightly above the card top, converges at bottom
-    // Produces a soft "light from above" luminance hierarchy even with LinearGradient
     start:        { x: 0.5, y: -0.15 },
     end:          { x: 0.5, y: 1 },
   },
@@ -102,13 +100,6 @@ const gradientConfig: Record<'premium' | 'featured' | 'accent-navy' | 'accent-ru
     start:        { x: 0.5, y: -0.15 },
     end:          { x: 0.5, y: 1 },
   },
-  'accent-navy': {
-    kind:         'gradient',
-    colors:       cardTokens.background.accentNavyGradient,
-    borderRadius: radius.lg,
-    start:        { x: 0, y: 0 },
-    end:          { x: 0, y: 1 },
-  },
   'accent-rust': {
     kind:         'gradient',
     colors:       cardTokens.background.accentRustGradient,
@@ -116,6 +107,15 @@ const gradientConfig: Record<'premium' | 'featured' | 'accent-navy' | 'accent-ru
     start:        { x: 0, y: 0 },
     end:          { x: 0, y: 1 },
   },
+}
+
+// Guilloché rosette tone per gradient variant.
+// Bronze sings on the premium charcoal surface; warm copper & rust use light tone.
+// Solid variants carry no decor — restraint reads as premium.
+const decorTone: Record<'premium' | 'featured' | 'accent-rust', DecorTone> = {
+  premium:       'gold',
+  featured:      'light',
+  'accent-rust': 'light',
 }
 
 const paddingMap = {
@@ -139,34 +139,31 @@ export const Card: React.FC<CardProps> = ({
     setCardH(e.nativeEvent.layout.height)
   }
 
-  if (canonical === 'premium' || canonical === 'featured' || canonical === 'accent-navy' || canonical === 'accent-rust') {
+  if (canonical === 'premium' || canonical === 'featured' || canonical === 'accent-rust') {
     const cfg = gradientConfig[canonical]
-    const border = canonical === 'premium'
-      ? { borderWidth: 1, borderColor: 'rgba(255,255,255,0.06)' }
+    const cardBorder = canonical === 'premium'
+      ? { borderWidth: 1, borderColor: cardTokens.border.premium }
       : {}
     return (
-      <View style={[{ borderRadius: cfg.borderRadius, overflow: 'hidden' }, border, style]} onLayout={onLayout}>
+      <View style={[{ borderRadius: cfg.borderRadius, overflow: 'hidden' }, cardBorder, style]} onLayout={onLayout}>
         <LinearGradient
           colors={cfg.colors}
           start={cfg.start}
           end={cfg.end}
           style={styles.shell}
         >
-          <BlurView intensity={20} tint="dark" style={styles.fill}>
-            <View style={styles.glassTint} />
-            {typeof CardGraph === 'function' && cardW > 0 && (
-              <View style={styles.graphicOverlay} pointerEvents="none">
-                <CardGraph
-                  width={cardW}
-                  height={cardH}
-                  preserveAspectRatio="xMidYMid slice"
-                />
-              </View>
-            )}
-            <View style={{ padding: pad }}>
-              {children}
-            </View>
-          </BlurView>
+          {cardW > 0 && (
+            <Decor
+              pattern="rosette"
+              tone={decorTone[canonical]}
+              intensity="subtle"
+              width={cardW}
+              height={cardH}
+            />
+          )}
+          <View style={{ padding: pad }}>
+            {children}
+          </View>
         </LinearGradient>
       </View>
     )
@@ -187,21 +184,9 @@ export const Card: React.FC<CardProps> = ({
         style,
       ]}
     >
-      <BlurView intensity={20} tint="dark" style={styles.fill}>
-        <View style={styles.glassTint} />
-        {typeof CardGraph === 'function' && cardW > 0 && (
-          <View style={styles.graphicOverlay} pointerEvents="none">
-            <CardGraph
-              width={cardW}
-              height={cardH}
-              preserveAspectRatio="xMidYMid slice"
-            />
-          </View>
-        )}
-        <View style={{ padding: pad }}>
-          {children}
-        </View>
-      </BlurView>
+      <View style={{ padding: pad }}>
+        {children}
+      </View>
     </View>
   )
 }
@@ -209,16 +194,5 @@ export const Card: React.FC<CardProps> = ({
 const styles = StyleSheet.create({
   shell: {
     overflow: 'hidden',  // clips border-radius on child content
-  },
-  fill: {
-    flex: 1,
-  },
-  glassTint: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: tokens.specialty.glassTint,
-  },
-  graphicOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    opacity: 0.05,
   },
 })

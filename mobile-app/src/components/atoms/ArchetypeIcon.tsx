@@ -8,7 +8,6 @@ import CatalystSvg   from '../../../assets/symbols/archetypes/catalyst.svg'
 import GuardianSvg   from '../../../assets/symbols/archetypes/guardian.svg'
 import LighthouseSvg from '../../../assets/symbols/archetypes/lighthouse.svg'
 import MirrorSvg     from '../../../assets/symbols/archetypes/mirror.svg'
-import PhoenixSvg    from '../../../assets/symbols/archetypes/phoenix.svg'
 import SageSvg       from '../../../assets/symbols/archetypes/sage.svg'
 import StormSvg      from '../../../assets/symbols/archetypes/storm.svg'
 import VisionarySvg  from '../../../assets/symbols/archetypes/visionary.svg'
@@ -22,7 +21,9 @@ const ARCHETYPES: Record<string, React.FC<SvgProps>> = {
   guardian:   GuardianSvg,
   lighthouse: LighthouseSvg,
   mirror:     MirrorSvg,
-  phoenix:    PhoenixSvg,
+  // 'phoenix' archetype retains its name but uses the non-bird wildfire glyph —
+  // phoenix/bird imagery is retired per the brand brief (assets/symbols/archetypes/phoenix.svg removed).
+  phoenix:    WildfireSvg,
   sage:       SageSvg,
   storm:      StormSvg,
   visionary:  VisionarySvg,
