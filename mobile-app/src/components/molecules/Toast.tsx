@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react'
 import { Pressable, StyleSheet, ViewStyle } from 'react-native'
 import Animated, { FadeInDown, FadeOutUp } from 'react-native-reanimated'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import {
   CheckCircle,
   AlertTriangle,
@@ -52,6 +53,8 @@ export const Toast: React.FC<ToastProps> = ({
     return () => clearTimeout(timer)
   }, [visible, duration, onDismiss])
 
+  const insets = useSafeAreaInsets()
+
   if (!visible) return null
 
   const config = variantMap[variant]
@@ -63,7 +66,7 @@ export const Toast: React.FC<ToastProps> = ({
       exiting={FadeOutUp.duration(motionDuration.transition)}
       style={[
         styles.container,
-        { backgroundColor: config.backgroundColor },
+        { backgroundColor: config.backgroundColor, top: insets.top + space['2'] },
         style,
       ]}
     >
@@ -80,7 +83,6 @@ export const Toast: React.FC<ToastProps> = ({
 const styles = StyleSheet.create({
   container: {
     position:     'absolute',
-    top:          0,
     left:         layout.screenPadding,
     right:        layout.screenPadding,
     borderRadius: radius.md,
@@ -95,6 +97,6 @@ const styles = StyleSheet.create({
   },
   message: {
     flex:  1,
-    color: '#FFFFFF',
+    color: tokens.text.primary,
   },
 })

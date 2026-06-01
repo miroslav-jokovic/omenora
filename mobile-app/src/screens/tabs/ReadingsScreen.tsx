@@ -7,7 +7,7 @@ import {
   Alert,
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { Text, Chip, Button, ZodiacSymbol, ArchetypeIcon } from '../../components/atoms'
+import { Text, Chip, Button, ZodiacSymbol } from '../../components/atoms'
 import { Card, ReadingCard, TransitCard, SectionHeader, ReadingFeatureCard } from '../../components/organisms'
 import ReadingHero from '../../components/hero/ReadingHero'
 import { useProfileStore } from '../../stores/profileStore'
@@ -16,7 +16,7 @@ import api from '../../api/endpoints'
 import type { ArchetypeReading, NatalChartReading, ForecastReading } from '../../api/endpoints'
 import { remapAnswersForBackend } from '../../utils/answers'
 import { isPastDate } from '../../utils/time'
-import { tokens, space, layout, accent } from '../../design/tokens'
+import { tokens, space, layout } from '../../design/tokens'
 import { AtmosphericBackground } from '../../components/atmosphere'
 import type { ReadingsScreenProps } from '../../navigation/types'
 
@@ -357,14 +357,6 @@ export default function ReadingsScreen({ navigation: _navigation }: ReadingsScre
               eyebrow="Full Archetype Reading"
               title="Shadow, gifts, and the patterns that shape your life"
               description="The complete psychological framework of your archetype — how you move through the world, your shadow side, your core gifts, and how you show up in love and work."
-              glyph={
-                <ArchetypeIcon
-                  archetype={archetype ?? 'architect'}
-                  size={140}
-                  fill={accent.primary}
-                  opacity={1}
-                />
-              }
               onUnlockPress={handleUnlockPress}
             />
           )}
@@ -486,13 +478,6 @@ export default function ReadingsScreen({ navigation: _navigation }: ReadingsScre
               eyebrow="Complete Natal Chart"
               title="Every planet. Every house. Your full birth chart."
               description="All 10 planets in your chart — their signs, houses, aspects, and what each placement means for you personally."
-              glyph={
-                <ZodiacSymbol
-                  sign={sunSign ?? 'Aries'}
-                  size={140}
-                  opacity={1}
-                />
-              }
               onUnlockPress={handleUnlockPress}
             />
           )}
@@ -613,14 +598,6 @@ export default function ReadingsScreen({ navigation: _navigation }: ReadingsScre
               eyebrow="90-Day Forecast"
               title="The major themes, transits, and timing ahead"
               description="Month-by-month planetary guidance — key transits, peak periods, and how to move through each phase with your chart in mind."
-              glyph={
-                <ArchetypeIcon
-                  archetype="phoenix"
-                  size={140}
-                  fill={accent.primary}
-                  opacity={1}
-                />
-              }
               onUnlockPress={handleUnlockPress}
             />
           )}

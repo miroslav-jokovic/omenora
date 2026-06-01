@@ -9,7 +9,7 @@ import Animated, {
   withTiming,
   runOnJS,
 } from 'react-native-reanimated'
-import { useTheme } from '../../design/theme/useTheme'
+import { useReduceMotion } from '../../hooks/useReduceMotion'
 import { tokens, space, radius, layout } from '../../design/tokens'
 
 const SCREEN_HEIGHT = Dimensions.get('window').height
@@ -27,7 +27,7 @@ export const BottomSheet: React.FC<BottomSheetProps> = ({
   height,
   children,
 }) => {
-  const { reduceMotion } = useTheme()
+  const reduceMotion = useReduceMotion()
   const translateY = useSharedValue(SCREEN_HEIGHT)
   const [shouldRender, setShouldRender] = useState(visible)
   const keyboard = useAnimatedKeyboard()

@@ -8,7 +8,6 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import * as SplashScreen from 'expo-splash-screen';
 import { NavigationContainer } from '@react-navigation/native';
-import { ThemeProvider } from './src/design/theme/ThemeProvider';
 import { AuthProvider } from './src/context/AuthProvider'
 import { PurchasesProvider } from './src/context/PurchasesProvider';
 import { RootNavigator, navigationRef } from './src/navigation/RootNavigator';
@@ -133,17 +132,15 @@ function App() {
   return (
     <SafeAreaProvider onLayout={onLayoutRootView}>
       <GestureHandlerRootView style={{ flex: 1 }}>
-        <ThemeProvider>
-          <AuthProvider>
-            <DeepLinkHandler />
-            <PurchasesProvider>
-              <NavigationContainer ref={navigationRef}>
-                <RootNavigator />
-                <StatusBar style="light" />
-              </NavigationContainer>
-            </PurchasesProvider>
-          </AuthProvider>
-        </ThemeProvider>
+        <AuthProvider>
+          <DeepLinkHandler />
+          <PurchasesProvider>
+            <NavigationContainer ref={navigationRef}>
+              <RootNavigator />
+              <StatusBar style="light" />
+            </NavigationContainer>
+          </PurchasesProvider>
+        </AuthProvider>
       </GestureHandlerRootView>
     </SafeAreaProvider>
   );

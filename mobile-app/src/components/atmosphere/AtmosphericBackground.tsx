@@ -1,6 +1,6 @@
-// Screen-level atmospheric background. Renders 5 static layers (base gradient +
-// primary glow + optional counter glow + optional grain + optional vignette) below
-// children. Variant controls glow intensity. Token-only; never animate.
+// Screen-level atmospheric background. Renders 6 static layers (base gradient +
+// decorative ornament + primary glow + optional counter glow + optional grain +
+// optional vignette) below children. Variant controls glow intensity. Token-only; never animate.
 
 import React from 'react'
 import { Dimensions, StyleSheet, View } from 'react-native'
@@ -73,7 +73,7 @@ const GLOW_COORDS: Record<
   'top-center':    { cx: SCREEN_W * 0.50, cy: SCREEN_H * -0.05 },
   'bottom-left':   { cx: SCREEN_W * 0.28, cy: SCREEN_H * 0.75 },
   'bottom-right':  { cx: SCREEN_W * 0.72, cy: SCREEN_H * 0.75 },
-  'bottom-center': { cx: SCREEN_W * 0.50, cy: SCREEN_H * 1.05 }, // mirror of top-center
+  'bottom-center': { cx: SCREEN_W * 0.50, cy: SCREEN_H * 1.05 },
 }
 
 // Opposite corner mapping for counter glow
@@ -100,9 +100,9 @@ export default function AtmosphericBackground({
   vignette        = 'none',
   children,
 }: AtmosphericBackgroundProps) {
-  // 'standard' preset: top-center + bottom-center glows, grain, graphic SVG
+  // 'standard' preset: hero intensity, top-center + bottom-center glows, grain, graphic SVG
   const isStandard    = variant === 'standard'
-  const resolvedVariant: 'hero' | 'default' | 'muted' = isStandard ? 'default' : variant
+  const resolvedVariant: 'hero' | 'default' | 'muted' = isStandard ? 'hero' : variant
   const resolvedPosition  = isStandard ? 'top-center'    : glowPosition
   const resolvedCounter   = isStandard ? true            : counterGlow
   const resolvedGrain     = isStandard ? true            : grain
@@ -112,7 +112,7 @@ export default function AtmosphericBackground({
   const glowRadius  = SCREEN_W * GLOW_RADIUS[resolvedVariant]
   const primary     = GLOW_COORDS[resolvedPosition]
   const counterPos  = GLOW_COORDS[OPPOSITE_CORNER[resolvedPosition]]
-  const counterR    = SCREEN_W * 0.75  // bottom-center counter glow needs wider radius to fill screen base
+  const counterR    = glowRadius  // mirror of primary — same radius
 
   return (
     <>
@@ -209,10 +209,7 @@ export default function AtmosphericBackground({
           {/* Layer 2 — Primary glow */}
           <Rect x="0" y="0" width={SCREEN_W} height={SCREEN_H} fill="url(#atmGlowPrimary)" />
 
-          {/* Layer 3 — Counter glow (standard: bottom-center; manual: opposite corner) */}
-          {resolvedCounter && (
-            <Rect x="0" y="0" width={SCREEN_W} height={SCREEN_H} fill="url(#atmGlowCounter)" />
-          )}
+          {/* Layer 3 — Counter glow rendered separately above vignette (Layer 5b) */}
 
           {/* Layer 3b — CTA light pool (optional): wide elliptical warm pool at 82% screen height */}
           {ctaLightPool && (
@@ -253,6 +250,34 @@ export default function AtmosphericBackground({
             pointerEvents="none"
           />
         )}
+
+        {/* Layer 5b — Counter glow rendered AFTER vignette so it bleeds through */}
+        {resolvedCounter && (
+          <Svg
+            style={StyleSheet.absoluteFill}
+            viewBox={`0 0 ${SCREEN_W} ${SCREEN_H}`}
+            preserveAspectRatio="xMidYMid slice"
+            pointerEvents="none"
+          >
+            <Defs>
+              <RadialGradient
+                id="atmGlowCounterTop"
+                cx={counterPos.cx}
+                cy={counterPos.cy}
+                rx={counterR}
+                ry={counterR}
+                fx={counterPos.cx}
+                fy={counterPos.cy}
+                gradientUnits="userSpaceOnUse"
+              >
+                <Stop offset="0"   stopColor={atmosphere.glowColor} stopOpacity={atmosphere.counter.center.toString()} />
+                <Stop offset="0.5" stopColor={atmosphere.glowColor} stopOpacity={atmosphere.counter.mid.toString()} />
+                <Stop offset="1"   stopColor={atmosphere.glowColor} stopOpacity="0" />
+              </RadialGradient>
+            </Defs>
+            <Rect x="0" y="0" width={SCREEN_W} height={SCREEN_H} fill="url(#atmGlowCounterTop)" />
+          </Svg>
+        )}
       </View>
 
       {/* Layer 6 — Children rendered on top of all atmosphere layers */}
@@ -270,7 +295,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left:     0,
     right:    0,
-    height:   SCREEN_H * 0.42,
+    height:   SCREEN_H * 0.28,
   },
   vignetteBottom: {
     bottom: 0,

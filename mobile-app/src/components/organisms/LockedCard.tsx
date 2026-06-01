@@ -64,6 +64,6 @@ const styles = StyleSheet.create({
     marginTop: space['2'],
   },
   cta: {
-    marginTop: space['4'],
+    marginTop: space['10'],
   },
 })

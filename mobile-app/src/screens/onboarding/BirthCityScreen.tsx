@@ -9,7 +9,7 @@ import { Text, Button } from '../../components/atoms'
 import { CityField } from '../../components/molecules'
 import { AtmosphericBackground } from '../../components/atmosphere'
 import { useProfileStore } from '../../stores/profileStore'
-import { surface, space, layout, tokens } from '../../design/tokens'
+import { surface, text, space, layout } from '../../design/tokens'
 import { RootStackParamList } from '../../navigation/types'
 import type { Place } from '../../api/nominatim'
 
@@ -56,7 +56,7 @@ export default function BirthCityScreen() {
           hitSlop={12}
           style={styles.backButton}
         >
-          <ChevronLeft size={24} color={tokens.text.secondary} />
+          <ChevronLeft size={24} color={text.secondary} />
         </Pressable>
         <View style={styles.content}>
           <MotiView

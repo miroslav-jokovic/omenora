@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
     width:           '100%',
     height:          50,
     borderRadius:    12,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: tokens.specialty.white,
     flexDirection:   'row',
     alignItems:      'center',
     justifyContent:  'center',

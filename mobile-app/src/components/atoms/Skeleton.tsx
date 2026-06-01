@@ -9,7 +9,7 @@ import Animated, {
 } from 'react-native-reanimated'
 import { LinearGradient } from 'expo-linear-gradient'
 import { tokens, radius as radiusTokens, duration } from '../../design/tokens'
-import { useTheme } from '../../design/theme/useTheme'
+import { useReduceMotion } from '../../hooks/useReduceMotion'
 
 type RadiusKey = keyof typeof radiusTokens
 
@@ -26,7 +26,7 @@ export const Skeleton: React.FC<SkeletonProps> = ({
   radius: radiusKey = 'sm',
   style,
 }) => {
-  const { reduceMotion } = useTheme()
+  const reduceMotion = useReduceMotion()
   const shimmer = useSharedValue(-1)
 
   useEffect(() => {

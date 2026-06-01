@@ -1,7 +1,6 @@
 import React from 'react'
 import { View, StyleSheet } from 'react-native'
 import { Text } from '../atoms/Text'
-import { ArchetypeIcon } from '../atoms/ArchetypeIcon'
 import { Card } from '../organisms/Card'
 import { accent } from '../../design/tokens/colors'
 import { space } from '../../design/tokens/spacing'
@@ -15,7 +14,7 @@ export interface ReadingHeroProps {
 }
 
 export default function ReadingHero({
-  archetypeKey,
+  archetypeKey: _archetypeKey,
   archetypeDisplayName,
   element,
   powerTraits,
@@ -32,18 +31,6 @@ export default function ReadingHero({
 
   return (
     <Card variant="featured" padding="premium">
-      {/* Watermark glyph — absolutely positioned right side, editorial bleed */}
-      {archetypeKey != null && (
-        <View style={styles.glyphWrap} pointerEvents="none">
-          <ArchetypeIcon
-            archetype={archetypeKey}
-            size={160}
-            fill={accent.primary}
-            opacity={0.18}
-          />
-        </View>
-      )}
-
       {/* Text content layer */}
       <View style={styles.content}>
         <Text variant="subMicro" style={styles.eyebrow}>
@@ -77,17 +64,7 @@ export default function ReadingHero({
 }
 
 const styles = StyleSheet.create({
-  glyphWrap: {
-    position: 'absolute',
-    right:    -space['5'],
-    top:      0,
-    bottom:   0,
-    justifyContent: 'center',
-  },
-  content: {
-    // Leaves right room for glyph bleed — glyph is 160pt wide, right: -20 means ~140pt visually intrudes
-    paddingRight: space['12'],
-  },
+  content: {},
   eyebrow: {
     color:         accent.primary,
     letterSpacing: 1.5,

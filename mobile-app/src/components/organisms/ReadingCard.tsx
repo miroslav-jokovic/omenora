@@ -4,7 +4,7 @@ import type { LucideIcon } from 'lucide-react-native'
 import * as Haptics from 'expo-haptics'
 import { Text, Icon, ZodiacSymbol } from '../atoms'
 import { Card } from './Card'
-import { space, text } from '../../design/tokens'
+import { tokens, space } from '../../design/tokens'
 
 const ZODIAC_SIGNS = new Set([
   'Aries','Taurus','Gemini','Cancer','Leo','Virgo',
@@ -48,7 +48,7 @@ export const ReadingCard: React.FC<ReadingCardProps> = ({
         ) : symbol != null && isZodiacSign(symbol) ? (
           <ZodiacSymbol sign={symbol} size={32} opacity={0.65} />
         ) : symbol != null ? (
-          <Text variant="display2" style={{ lineHeight: 32, /* intentional: clamps display2 (40pt) glyph cell to match adjacent heading2 row height */ color: text.disabled }}>
+          <Text variant="display2" style={{ lineHeight: 32, /* intentional: clamps display2 (40pt) glyph cell to match adjacent heading2 row height */ color: tokens.text.disabled }}>
             {symbol}
           </Text>
         ) : null}

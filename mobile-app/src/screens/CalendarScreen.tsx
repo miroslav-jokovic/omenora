@@ -1,9 +1,10 @@
-import React, { useState, useCallback, useMemo } from 'react'
+import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react'
 import { ScrollView, View, Pressable, ActivityIndicator, Alert, Dimensions, StyleSheet } from 'react-native'
 import { X, AlertTriangle } from 'lucide-react-native'
 import { Text, Button, Chip } from '../components/atoms'
 import { Card, LockedCard, Header, BottomSheet } from '../components/organisms'
 import { ScreenWrapper, ErrorState } from '../components/templates'
+import { CalendarIAPSheet, Toast } from '../components/molecules'
 import { useProfileStore } from '../stores/profileStore'
 import { usePurchases } from '../context/usePurchases'
 import api from '../api/endpoints'
@@ -123,9 +124,20 @@ export const CalendarScreen: React.FC<CalendarScreenProps> = ({ navigation }) =>
   const calendarData     = useProfileStore((s) => s.calendarData)
   const setCalendarData  = useProfileStore((s) => s.setCalendarData)
 
-  const { hasCalendar, presentPaywall, purchaseCalendar, calendarProduct } = usePurchases()
+  const { hasCalendar } = usePurchases()
 
-  const [isPurchasingCalendar, setIsPurchasingCalendar] = useState(false)
+  const [iapSheetVisible, setIapSheetVisible] = useState(false)
+  const [toast, setToast] = useState<{ visible: boolean; message: string }>({ visible: false, message: '' })
+
+  const prevHasCalendar   = useRef(hasCalendar)
+  const sheetWasOpen      = useRef(false)
+
+  useEffect(() => {
+    if (!prevHasCalendar.current && hasCalendar && sheetWasOpen.current) {
+      setToast({ visible: true, message: 'Purchases restored' })
+    }
+    prevHasCalendar.current = hasCalendar
+  }, [hasCalendar])
 
   const [state, setState] = useState<ScreenState>(
     // TODO: v1.1 — detect calendar.year mismatch vs current year and prompt
@@ -178,32 +190,10 @@ export const CalendarScreen: React.FC<CalendarScreenProps> = ({ navigation }) =>
     }
   }, [firstName, archetype, report, lifePathNumber, dateOfBirth, languageOverride, answers, setCalendarData])
 
-  const handleUnlockPress = useCallback(async () => {
-    try {
-      await presentPaywall()
-    } catch (err) {
-      console.warn('[Calendar] presentPaywall threw:', err)
-    }
-  }, [presentPaywall])
-
-  const handleBuyCalendar = useCallback(async () => {
-    if (isPurchasingCalendar) return
-    setIsPurchasingCalendar(true)
-    try {
-      await purchaseCalendar()
-      setCalendarData(null)
-    } catch (err: any) {
-      if (err?.userCancelled === true) {
-        return
-      }
-      Alert.alert(
-        'Purchase failed',
-        "Couldn't complete the purchase. Please try again or contact support@omenora.com.",
-      )
-    } finally {
-      setIsPurchasingCalendar(false)
-    }
-  }, [isPurchasingCalendar, purchaseCalendar, setCalendarData])
+  const handleUnlockPress = useCallback(() => {
+    sheetWasOpen.current = true
+    setIapSheetVisible(true)
+  }, [])
 
   const handleRegeneratePress = useCallback(() => {
     Alert.alert(
@@ -317,30 +307,12 @@ export const CalendarScreen: React.FC<CalendarScreenProps> = ({ navigation }) =>
               </>
 
             ) : (
-              <>
-                <LockedCard
-                  placement="feature_calendar"
-                  title="Your 2026 Lucky Timing"
-                  description="12 months of peak periods, caution dates, and lucky windows — mapped to your personal chart."
-                  onUnlockPress={handleUnlockPress}
-                />
-                <Pressable
-                  onPress={handleBuyCalendar}
-                  disabled={isPurchasingCalendar}
-                  accessibilityRole="button"
-                  accessibilityLabel={`Buy 2026 Calendar for ${calendarProduct?.priceString ?? '$4.99'}`}
-                  style={({ pressed }) => [
-                    styles.calendarBuyBtn,
-                    (isPurchasingCalendar || pressed) && styles.calendarBuyBtnPressed,
-                  ]}
-                >
-                  <Text variant="label" style={styles.calendarBuyBtnText}>
-                    {isPurchasingCalendar
-                      ? 'Processing…'
-                      : `Buy 2026 Calendar — ${calendarProduct?.priceString ?? '$4.99'}`}
-                  </Text>
-                </Pressable>
-              </>
+              <LockedCard
+                placement="feature_calendar"
+                title="Your 2026 Lucky Timing"
+                description="12 months of peak periods, caution dates, and lucky windows — mapped to your personal chart."
+                onUnlockPress={handleUnlockPress}
+              />
             )}
           </ScrollView>
         )}
@@ -355,6 +327,22 @@ export const CalendarScreen: React.FC<CalendarScreenProps> = ({ navigation }) =>
           <MonthDetail month={expandedMonthData} onClose={() => setExpandedMonth(null)} />
         )}
       </BottomSheet>
+      <CalendarIAPSheet
+        visible={iapSheetVisible}
+        onDismiss={() => {
+          sheetWasOpen.current = false
+          setIapSheetVisible(false)
+        }}
+        onPurchaseSuccess={() => {
+          setToast({ visible: true, message: '2026 Calendar unlocked' })
+        }}
+      />
+      <Toast
+        variant="success"
+        message={toast.message}
+        visible={toast.visible}
+        onDismiss={() => setToast((t) => ({ ...t, visible: false }))}
+      />
     </View>
   )
 }
@@ -406,21 +394,5 @@ const styles = StyleSheet.create({
   energyFill: {
     height:       '100%',
     borderRadius: radius.xs,
-  },
-  calendarBuyBtn: {
-    borderWidth:       1,
-    borderColor:       tokens.border.default,
-    borderRadius:      radius.md,
-    paddingVertical:   space['3'],
-    paddingHorizontal: space['5'],
-    minHeight:         layout.tapTarget,
-    alignItems:        'center',
-    justifyContent:    'center',
-  },
-  calendarBuyBtnPressed: {
-    opacity: 0.6,
-  },
-  calendarBuyBtnText: {
-    color: tokens.text.secondary,
   },
 })

@@ -63,7 +63,7 @@ export default function NotificationsScreen({ navigation }: NotificationsScreenP
       } else {
         Alert.alert(
           'Enable notifications in Settings',
-          'To turn on daily horoscope reminders, allow notifications for OMENORA in your iOS Settings.',
+          'To turn on daily horoscope reminders, allow notifications for OMENORA in Settings.',
           [
             { text: 'Cancel', style: 'cancel' },
             { text: 'Open Settings', onPress: () => Linking.openSettings() },

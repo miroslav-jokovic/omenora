@@ -3,7 +3,8 @@ import { ScrollView, View, ActivityIndicator, StyleSheet } from 'react-native'
 import { ScreenWrapper, ErrorState } from '../components/templates'
 import { Header, Card, LockedCard } from '../components/organisms'
 import { Text, Button } from '../components/atoms'
-import { TextField, DateField } from '../components/molecules'
+import { TextField, DateField, CompatibilityIAPSheet, Toast } from '../components/molecules'
+import { parseBackendError } from '../api/errors'
 import { useProfileStore } from '../stores/profileStore'
 import { usePurchases } from '../context/usePurchases'
 import api from '../api/endpoints'
@@ -44,12 +45,14 @@ export const CompatibilityScreen: React.FC<CompatibilityScreenProps> = ({ naviga
   const languageOverride = useProfileStore((s) => s.languageOverride)
   const report           = useProfileStore((s) => s.report)
 
-  const { isPremium, presentPaywall } = usePurchases()
+  const { isPremium, presentPaywall, compatibilityAddonOffering } = usePurchases()
 
   const [screenState, setScreenState]       = useState<ScreenState>({ kind: 'initial' })
   const [partnerName, setPartnerName]       = useState('')
   const [partnerCity, setPartnerCity]       = useState('')
   const [partnerDobDate, setPartnerDobDate] = useState<Date | null>(null)
+  const [iapSheetVisible, setIapSheetVisible] = useState(false)
+  const [toast, setToast] = useState<{ visible: boolean; message: string }>({ visible: false, message: '' })
 
   const canSubmit = partnerName.trim().length > 0 && partnerDobDate != null
 
@@ -87,16 +90,34 @@ export const CompatibilityScreen: React.FC<CompatibilityScreenProps> = ({ naviga
         setScreenState({ kind: 'error', message: 'Something went wrong. Please try again.' })
       }
     } catch (err) {
-      const httpStatus = (err as { response?: { status?: number } })?.response?.status
-      if (httpStatus === 429) {
-        setScreenState({ kind: 'error', message: "You've reached your monthly compatibility limit. Resets next month." })
-      } else if (httpStatus === 403) {
-        setScreenState({ kind: 'error', message: 'Compatibility requires Premium. Tap below to unlock.' })
-      } else {
-        setScreenState({ kind: 'error', message: "Couldn't generate the reading. Please try again." })
+      const parsed = parseBackendError(err)
+
+      if (parsed.kind === 'subscription_required') {
+        setScreenState({ kind: 'initial' })
+        if (compatibilityAddonOffering !== null) {
+          setIapSheetVisible(true)
+        } else {
+          await presentPaywall()
+        }
+        return
       }
+
+      if (parsed.kind === 'cap_reached') {
+        if (compatibilityAddonOffering !== null) {
+          setScreenState({ kind: 'initial' })
+          setIapSheetVisible(true)
+        } else {
+          setScreenState({
+            kind: 'error',
+            message: "You've reached your monthly compatibility limit. Resets next month.",
+          })
+        }
+        return
+      }
+
+      setScreenState({ kind: 'error', message: "Couldn't generate the reading. Please try again." })
     }
-  }, [canSubmit, archetype, report, firstName, partnerName, partnerDobDate, partnerCity, languageOverride, lifePathNumber, dateOfBirth])
+  }, [canSubmit, archetype, report, firstName, partnerName, partnerDobDate, partnerCity, languageOverride, lifePathNumber, dateOfBirth, compatibilityAddonOffering, presentPaywall])
 
   const handleUnlockPress = useCallback(async () => {
     try {
@@ -228,6 +249,20 @@ export const CompatibilityScreen: React.FC<CompatibilityScreenProps> = ({ naviga
           )}
         </ScrollView>
       )}
+      <CompatibilityIAPSheet
+        visible={iapSheetVisible}
+        onDismiss={() => setIapSheetVisible(false)}
+        onPurchaseSuccess={() => {
+          setToast({ visible: true, message: 'Compatibility reading unlocked' })
+          void handleSubmit()
+        }}
+      />
+      <Toast
+        variant="success"
+        message={toast.message}
+        visible={toast.visible}
+        onDismiss={() => setToast((t) => ({ ...t, visible: false }))}
+      />
     </ScreenWrapper>
   )
 }

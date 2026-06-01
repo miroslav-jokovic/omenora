@@ -29,7 +29,7 @@ Or manually:
 1. Go to https://github.com/new
 2. Name: `omenora`
 3. Create repository
-4. Run: `git remote add origin https://github.com/fleetup/omenora.git`
+4. Run: `git remote add origin https://github.com/miroslav-jokovic/omenora.git`
 5. Run: `git push -u origin main`
 
 ### Step 2: Deploy to Railway
@@ -52,7 +52,7 @@ railway up
 **Option B: Railway Dashboard**
 1. Go to https://railway.app/new
 2. Click "Deploy from GitHub repo"
-3. Select `fleetup/omenora`
+3. Select `miroslav-jokovic/omenora`
 4. Add environment variables (see below)
 5. Deploy
 

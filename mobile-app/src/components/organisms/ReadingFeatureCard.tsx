@@ -18,8 +18,6 @@ export interface ReadingFeatureCardProps {
   title:        string
   /** Value-prop body copy */
   description:  string
-  /** Pre-rendered icon/glyph node. The wrapper applies 0.16 opacity watermark treatment. */
-  glyph:        React.ReactNode
   /** CTA button label. Defaults to "Unlock". */
   ctaLabel?:    string
   onUnlockPress: () => void
@@ -32,7 +30,6 @@ export const ReadingFeatureCard: React.FC<ReadingFeatureCardProps> = ({
   eyebrow,
   title,
   description,
-  glyph,
   ctaLabel = 'Unlock',
   onUnlockPress,
   placement: _placement,
@@ -47,13 +44,6 @@ export const ReadingFeatureCard: React.FC<ReadingFeatureCardProps> = ({
 
   return (
     <Card variant={cardVariant} padding="premium">
-      {/* Watermark glyph — absolutely positioned right, vertically centered, fixed 0.16 opacity */}
-      <View style={styles.glyphWrap} pointerEvents="none">
-        <View style={styles.glyphOpacity}>
-          {glyph}
-        </View>
-      </View>
-
       {/* Text content layer */}
       <View style={styles.content}>
         <Text variant="subMicro" style={[styles.eyebrow, { color: eyebrowColor }]}>
@@ -78,20 +68,7 @@ export const ReadingFeatureCard: React.FC<ReadingFeatureCardProps> = ({
 }
 
 const styles = StyleSheet.create({
-  glyphWrap: {
-    position:       'absolute',
-    right:          -space['4'],
-    top:            0,
-    bottom:         0,
-    justifyContent: 'center',
-  },
-  glyphOpacity: {
-    opacity: 0.16,
-  },
-  content: {
-    // Reserves right space so text doesn't collide with glyph watermark
-    paddingRight: space['12'],
-  },
+  content: {},
   eyebrow: {
     letterSpacing: 1.5,
   },

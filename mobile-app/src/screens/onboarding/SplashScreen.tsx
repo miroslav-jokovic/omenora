@@ -4,7 +4,7 @@ import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import Svg, { Circle } from 'react-native-svg'
 import { Text } from '../../components/atoms'
-import { surface } from '../../design/tokens'
+import { tokens } from '../../design/tokens'
 import { RootStackParamList } from '../../navigation/types'
 import { useAuth } from '../../context/useAuth'
 import { useProfileStore, useProfileComplete } from '../../stores/profileStore'
@@ -175,7 +175,7 @@ export default function SplashScreen() {
 const styles = StyleSheet.create({
   container: {
     flex:            1,
-    backgroundColor: surface.base,
+    backgroundColor: tokens.surface.base,
     alignItems:      'center',
     justifyContent:  'center',
   },

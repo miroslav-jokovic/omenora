@@ -36,9 +36,9 @@ apiClient.interceptors.response.use(
       // Server responded with error status
       console.error('API Error:', error.response.status, error.response.data);
       
-      // Handle rate limiting
+      // Handle rate limiting — pass through as raw AxiosError so callers can read response body
       if (error.response.status === 429) {
-        return Promise.reject(new Error('Too many requests. Please try again later.'));
+        return Promise.reject(error);
       }
       
       // Handle authentication errors
@@ -57,3 +57,10 @@ apiClient.interceptors.response.use(
 );
 
 export default apiClient;
+
+export function getErrorBody(err: unknown): { status: number; data: unknown } | null {
+  if (axios.isAxiosError(err) && err.response) {
+    return { status: err.response.status, data: err.response.data }
+  }
+  return null
+}

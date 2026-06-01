@@ -2,7 +2,7 @@ import React from 'react'
 import { View, ViewStyle } from 'react-native'
 import { Text } from '../atoms'
 import { Card } from './Card'
-import { space, text } from '../../design/tokens'
+import { tokens, space } from '../../design/tokens'
 
 export interface TransitCardProps {
   symbol: string
@@ -24,7 +24,7 @@ export const TransitCard: React.FC<TransitCardProps> = ({
       <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: space['3'] }}>
         <Text
           variant="display2"
-          style={{ lineHeight: 32, /* intentional: clamps display2 (40pt) glyph cell to match adjacent label row height */ minWidth: 28, textAlign: 'center', color: text.disabled }}
+          style={{ lineHeight: 32, /* intentional: clamps display2 (40pt) glyph cell to match adjacent label row height */ minWidth: 28, textAlign: 'center', color: tokens.text.disabled }}
         >
           {symbol}
         </Text>

@@ -284,7 +284,7 @@ function computeCompatibilityTitle(archetypeA: string, archetypeB: string, eleme
 }
 
 export default defineEventHandler(async (event) => {
-  const ctx = await requirePremiumWithUsage(event, 'compatibility')
+  const ctx = await requirePremiumOrCreditAccess(event, 'compatibility', 'compat')
 
   const config = useRuntimeConfig()
 
@@ -478,6 +478,11 @@ ${lifePathNote}${thematicBlocks}`
   // This reduces preview latency from 15-20 seconds to ~3-5 seconds.
 
   if (previewMode) {
+    if (ctx.source === 'credit') {
+      console.log('[compatibility] credit-source user requested preview mode; serving full mode instead', { userId: ctx.userId })
+      // fall through to full-mode path below
+    }
+    else {
     const compatibilityScore = computeCompatibilityScore(lifePathNumber, partnerLifePath, element || 'Unknown', partnerElement)
     const compatibilityTitle = computeCompatibilityTitle(archetype, partnerSunSign.name, element || 'Unknown', partnerElement)
 
@@ -570,6 +575,7 @@ Return ONLY valid JSON, no markdown:
         previewMode: true,
       },
     }
+    } // end premium preview branch
   }
 
   // ── FULL PATH (post-payment) ───────────────────────────────────────────────
@@ -755,7 +761,15 @@ Return ONLY valid JSON, no markdown:
     generatedAt:       new Date().toISOString(),
   }
 
-  await incrementUsage(ctx.userId, ctx.feature, ctx.period)
+  let usagePayload: Record<string, unknown>
+  if (ctx.source === 'premium') {
+    await incrementUsage(ctx.userId, ctx.feature, ctx.period)
+    usagePayload = { source: 'premium', count: ctx.count + 1, cap: ctx.cap, period: ctx.period, resets_at: ctx.resetsAt }
+  }
+  else {
+    const newBalance = await consumeCredit(ctx.userId, 'compat')
+    usagePayload = { source: 'credit', credit_balance_remaining: newBalance }
+  }
 
   return {
     success: true,
@@ -765,5 +779,6 @@ Return ONLY valid JSON, no markdown:
       sections: sectionsData,
       calculationReceipt,
     },
+    usage: usagePayload,
   }
 })

@@ -117,7 +117,7 @@ export default function TodayScreen({ navigation }: TodayScreenProps) {
   if (loading) {
     return (
       <View style={styles.root}>
-        <AtmosphericBackground variant="muted" />
+        <AtmosphericBackground variant="standard" />
         <SafeAreaView edges={['top']} style={styles.safe}>
           <View style={styles.center}>
             <ActivityIndicator color={tokens.accent.primary} size="large" />
@@ -131,7 +131,7 @@ export default function TodayScreen({ navigation }: TodayScreenProps) {
   if (error || !archetypeContent) {
     return (
       <View style={styles.root}>
-        <AtmosphericBackground variant="muted" />
+        <AtmosphericBackground variant="standard" />
         <SafeAreaView edges={['top']} style={styles.safe}>
           <ErrorState
             heading="Couldn't load today"
@@ -147,9 +147,7 @@ export default function TodayScreen({ navigation }: TodayScreenProps) {
   // ── Success ────────────────────────────────────────────────────────────────
   return (
     <View style={styles.root}>
-      <AtmosphericBackground
-        variant="muted"
-      />
+      <AtmosphericBackground variant="standard" />
       <SafeAreaView edges={['top']} style={styles.safe}>
       <ScrollView
         contentContainerStyle={styles.scroll}

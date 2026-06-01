@@ -9,7 +9,7 @@ import { useProfileStore } from '../../stores/profileStore'
 import { useAuth } from '../../context/useAuth'
 import { saveProfile, ProfileSaveError } from '../../services/profileService'
 import { supabase } from '../../lib/supabase'
-import { surface, space, layout } from '../../design/tokens'
+import { tokens, space, layout } from '../../design/tokens'
 import { AtmosphericBackground } from '../../components/atmosphere'
 import { api } from '../../api/endpoints'
 import { RootStackParamList } from '../../navigation/types'
@@ -240,7 +240,7 @@ export default function CalculatingScreen() {
 const styles = StyleSheet.create({
   container: {
     flex:            1,
-    backgroundColor: surface.base,
+    backgroundColor: tokens.surface.base,
     alignItems:      'center',
     justifyContent:  'center',
     position:        'relative',

@@ -6,7 +6,6 @@ import {
   NatalChartReadingRequestSchema,
 } from '~~/server/utils/ai-schemas'
 import { withAiRetry } from '~~/server/utils/ai-retry'
-import { getLanguageInstruction } from '~~/server/utils/language-instructions'
 
 /**
  * POST /api/reports/natal-chart
@@ -37,7 +36,15 @@ export default defineEventHandler(async (event) => {
     sunSign, moonSign, risingSign, powerTraits, language,
   } = bodyResult.data
 
-  const langInstruction = getLanguageInstruction(language)
+  const languageInstructions: Record<string, string> = {
+    en: 'Respond entirely in English.',
+    es: 'Responde completamente en español. Usa un tono cálido, poético y personal.',
+    pt: 'Responda completamente em português brasileiro. Use tom caloroso e pessoal.',
+    hi: 'पूरी तरह से हिंदी में जवाब दें।',
+    ko: '전체적으로 한국어로 답변해 주세요.',
+    zh: '完全用简体中文回答。',
+  }
+  const langInstruction = languageInstructions[language] ?? languageInstructions['en'] ?? ''
 
   const client = new Anthropic({ apiKey: config.anthropicApiKey as string })
 

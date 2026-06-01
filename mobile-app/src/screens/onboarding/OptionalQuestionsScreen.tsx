@@ -27,17 +27,6 @@ const QUESTIONS = [
     ],
   },
   {
-    id: 'current_season',
-    question: 'How does this season feel?',
-    type: 'multi' as const,
-    options: [
-      { value: 'stuck',      label: 'Feeling stuck'   },
-      { value: 'transition', label: 'In transition'   },
-      { value: 'high',       label: 'On a high'       },
-      { value: 'clarity',    label: 'Seeking clarity' },
-    ],
-  },
-  {
     id: 'tone_pref',
     question: 'How would you like your reading to sound?',
     type: 'single' as const,
@@ -114,7 +103,7 @@ export default function OptionalQuestionsScreen() {
         <View style={styles.footerActions}>
           <Button
             label={isLast ? 'Finish' : 'Continue'}
-            variant="primary"
+            variant="premium"
             fullWidth
             disabled={!canContinue}
             onPress={handleContinue}

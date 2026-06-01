@@ -17,10 +17,11 @@ export const text = {
 } as const
 
 export const accent = {
-  primary:  '#A87D4E',  // aged bronze (web: --omn-accent)
-  quiet:    '#6E5536',  // hover state, subtle bronze borders (web: --omn-accent-quiet)
-  subtle:   'rgba(168,125,78,0.10)',
-  muted:    'rgba(168,125,78,0.04)',
+  primary:   '#A87D4E',  // aged bronze (web: --omn-accent)
+  quiet:     '#6E5536',  // hover state, subtle bronze borders (web: --omn-accent-quiet)
+  subtle:    'rgba(168,125,78,0.10)',
+  muted:     'rgba(168,125,78,0.04)',
+  emphasis:  '#C49A5E',  // lighter bronze — recommended/highlighted accent states
 } as const
 
 // ── CTA — primary purchase actions only ──────────────────────────────────────
@@ -58,6 +59,8 @@ export const specialty = {
   forecastStaleSurface: 'rgba(168,125,78,0.12)',
   heroScrim:            'rgba(18,18,20,1.0)',
   heroScrimTransparent: 'rgba(18,18,20,0)',
+  premiumBtnGradient:   ['#2C3D62', '#1A2444'] as const,
+  premiumBtnOverlay:    'rgba(80,110,180,0.15)',
 } as const
 
 export const gradient = {

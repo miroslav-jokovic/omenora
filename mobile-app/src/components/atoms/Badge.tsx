@@ -82,6 +82,6 @@ const styles = StyleSheet.create({
     color: tokens.text.accent,
   },
   countText: {
-    color: '#FFFFFF',
+    color: tokens.specialty.white,
   },
 })

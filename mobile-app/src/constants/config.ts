@@ -38,12 +38,5 @@ export const ZODIAC_SIGNS = [
   'Sagittarius', 'Capricorn', 'Aquarius', 'Pisces'
 ] as const;
 
-// Archetypes
-export const ARCHETYPES = [
-  'The Visionary', 'The Strategist', 'The Nurturer',
-  'The Creator', 'The Explorer', 'The Harmonizer',
-  'The Seeker', 'The Leader', 'The Sage'
-] as const;
-
 // Life Path Numbers
 export const LIFE_PATH_NUMBERS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 22, 33] as const;

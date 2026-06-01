@@ -9,7 +9,7 @@ import { AtmosphericBackground } from '../../components/atmosphere'
 import { useProfileStore } from '../../stores/profileStore'
 import { useAuth } from '../../context/useAuth'
 import { usePurchases } from '../../context/usePurchases'
-import { surface, border, space, layout } from '../../design/tokens'
+import { tokens, space, layout } from '../../design/tokens'
 import { RootStackParamList } from '../../navigation/types'
 
 type PremiumTeaserNavProp = NativeStackNavigationProp<RootStackParamList, 'PremiumTeaser'>
@@ -172,7 +172,7 @@ export default function PremiumTeaserScreen() {
 const styles = StyleSheet.create({
   container: {
     flex:            1,
-    backgroundColor: surface.deep,
+    backgroundColor: tokens.surface.deep,
   },
   safe: {
     flex:              1,
@@ -203,7 +203,7 @@ const styles = StyleSheet.create({
   dinkusLine: {
     flex:            1,
     height:          1,
-    backgroundColor: border.gold,
+    backgroundColor: tokens.border.gold,
   },
   dinkusGlyph: {
     paddingHorizontal: space['3'],

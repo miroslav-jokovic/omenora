@@ -6,8 +6,11 @@ import {
   ViewStyle,
   View,
 } from 'react-native'
+import { LinearGradient } from 'expo-linear-gradient'
 import { BlurView } from 'expo-blur'
 import * as Haptics from 'expo-haptics'
+import SunGraph from '../../../assets/svg-bg/Card-Graphs/Sun-Graph-Mobile.svg'
+import PlanetGraph from '../../../assets/svg-bg/Card-Graphs/Planet-Graph-Mobile.svg'
 import type { LucideIcon } from 'lucide-react-native'
 import {
   tokens,
@@ -69,7 +72,8 @@ const PremiumButtonShell: React.FC<{
   fullWidth: boolean
   icon?:     LucideIcon
   label:     string
-}> = ({ onPress, disabled, loading, fullWidth, icon, label }) => {
+  style?:    ViewStyle
+}> = ({ onPress, disabled, loading, fullWidth, icon, label, style }) => {
   const IconComponent = icon
   return (
     <Pressable
@@ -80,15 +84,41 @@ const PremiumButtonShell: React.FC<{
         fullWidth && styles.fullWidth,
         (disabled || loading) && styles.disabled,
         pressed && { opacity: 0.65, transform: [{ scale: 0.98 }] },
+        style,
       ]}
     >
+      <LinearGradient
+        colors={tokens.specialty.premiumBtnGradient}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 1 }}
+        style={StyleSheet.absoluteFill}
+      />
       <BlurView
-        intensity={18}
-        tint="light"
+        intensity={28}
+        tint="dark"
         style={styles.premiumBlur}
       >
-        {/* Soft white tint over blur — makes it read as frosted glass */}
-        <View style={styles.premiumTint} />
+        <View style={styles.premiumSatOverlay} />
+        {typeof SunGraph === 'function' && (
+          <View style={[styles.btnSunOverlay, styles.btnGraphMuted]} pointerEvents="none">
+            <SunGraph
+              width={80}
+              height={80}
+              fill="#ffffff"
+              preserveAspectRatio="xMidYMid meet"
+            />
+          </View>
+        )}
+        {typeof PlanetGraph === 'function' && (
+          <View style={[styles.btnPlanetOverlay, styles.btnGraphMuted]} pointerEvents="none">
+            <PlanetGraph
+              width={90}
+              height={90}
+              fill="#ffffff"
+              preserveAspectRatio="xMidYMid meet"
+            />
+          </View>
+        )}
         {loading ? (
           <ActivityIndicator size="small" color={tokens.text.primary} />
         ) : (
@@ -132,6 +162,7 @@ export const Button: React.FC<ButtonProps> = ({
         fullWidth={fullWidth}
         icon={icon}
         label={label}
+        style={style}
       />
     )
   }
@@ -173,7 +204,7 @@ export const Button: React.FC<ButtonProps> = ({
 
 const styles = StyleSheet.create({
   premiumOuter: {
-    borderRadius: radius.xl,
+    borderRadius: radius.sm,
     overflow:     'hidden',
   },
   premiumBlur: {
@@ -183,9 +214,23 @@ const styles = StyleSheet.create({
     alignItems:        'center',
     justifyContent:    'center',
   },
-  premiumTint: {
+  premiumSatOverlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: tokens.specialty.glassTint,
+    backgroundColor: tokens.specialty.premiumBtnOverlay,
+  },
+  btnSunOverlay: {
+    position:  'absolute',
+    right:     -20,
+    top:       '50%',
+    marginTop: -40, // center vertically (half of 80)
+  },
+  btnPlanetOverlay: {
+    position: 'absolute',
+    left:     -24,
+    bottom:   -24,
+  },
+  btnGraphMuted: {
+    opacity: 0.08,
   },
   premiumInner: {
     flexDirection: 'row',

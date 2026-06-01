@@ -1,6 +1,6 @@
 /**
- * Remaps profileStore.answers keys (life_focus, current_season, tone_pref,
- * astro_familiarity) to backend-expected keys (p1, p2, p3).
+ * Remaps profileStore.answers keys (life_focus, tone_pref, astro_familiarity)
+ * to backend-expected keys (p1, p2, p3).
  *
  * The mismatch was surfaced in Phase 4 Cluster 3 recon and resolved in
  * Phase 5 Cluster 0 per [DECISION 4 in plan amendments 55a6391].
@@ -9,8 +9,6 @@
  *   - p1: primary focus for the period (from life_focus)
  *   - p2: insight tone preference (from tone_pref)
  *   - p3: reason for seeking the reading (from astro_familiarity)
- *
- * current_season is not used by any backend prompt (v1.1 cleanup item).
  */
 export function remapAnswersForBackend(
   answers: Record<string, string>

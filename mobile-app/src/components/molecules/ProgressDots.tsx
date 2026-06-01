@@ -8,7 +8,7 @@ import Animated, {
   interpolateColor,
 } from 'react-native-reanimated'
 import { tokens, space, radius, duration } from '../../design/tokens'
-import { useTheme } from '../../design/theme/useTheme'
+import { useReduceMotion } from '../../hooks/useReduceMotion'
 
 export interface ProgressDotsProps {
   total: number
@@ -56,7 +56,7 @@ export const ProgressDots: React.FC<ProgressDotsProps> = ({
   current,
   style,
 }) => {
-  const { reduceMotion } = useTheme()
+  const reduceMotion = useReduceMotion()
 
   if (total === 0) return <View style={[styles.container, style]} />
 

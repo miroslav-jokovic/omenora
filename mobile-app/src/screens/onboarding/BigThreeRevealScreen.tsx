@@ -101,7 +101,7 @@ export default function BigThreeRevealScreen() {
       >
         <Button
           label="Continue to deeper reading"
-          variant="primary"
+          variant="premium"
           fullWidth
           onPress={() => navigation.navigate('SaveYourReading')}
         />

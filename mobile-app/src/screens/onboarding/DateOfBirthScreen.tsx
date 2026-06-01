@@ -10,7 +10,7 @@ import { DateField } from '../../components/molecules'
 import { AtmosphericBackground } from '../../components/atmosphere'
 import { useProfileStore } from '../../stores/profileStore'
 import { calculateLifePathNumber } from '../../utils/lifePathNumber'
-import { surface, space, layout, tokens } from '../../design/tokens'
+import { surface, text, space, layout } from '../../design/tokens'
 import { RootStackParamList } from '../../navigation/types'
 
 type DateOfBirthNavProp = NativeStackNavigationProp<RootStackParamList, 'DateOfBirth'>
@@ -66,7 +66,7 @@ export default function DateOfBirthScreen() {
             hitSlop={12}
             style={styles.backButton}
           >
-            <ChevronLeft size={24} color={tokens.text.secondary} />
+            <ChevronLeft size={24} color={text.secondary} />
           </Pressable>
         <View style={styles.content}>
           <MotiView

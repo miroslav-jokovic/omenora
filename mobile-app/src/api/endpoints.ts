@@ -77,6 +77,7 @@ export interface CompatibilityReading {
 export interface CompatibilityResponse {
   success:       boolean
   compatibility: CompatibilityReading
+  usage:         CounselUsage
 }
 
 export interface DailyInsightRequest {
@@ -271,6 +272,21 @@ export interface GetDailyCacheResponse {
 
 // ── Counsel (Phase 5) ────────────────────────────────────────────────────────
 
+export type UsagePremium = {
+  source:    'premium'
+  count:     number
+  cap:       number
+  period:    string
+  resets_at: string
+}
+
+export type UsageCredit = {
+  source:                   'credit'
+  credit_balance_remaining: number
+}
+
+export type CounselUsage = UsagePremium | UsageCredit
+
 export interface CounselConversationTurn {
   role:    'user' | 'assistant'
   content: string
@@ -297,12 +313,7 @@ export interface CounselMessageRequest {
 export interface CounselMessageResponse {
   success:  boolean
   response: string
-  usage: {
-    count:     number
-    cap:       number
-    period:    string
-    resets_at: string
-  }
+  usage:    CounselUsage
 }
 
 // API Endpoints

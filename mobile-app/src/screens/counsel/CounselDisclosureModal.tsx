@@ -99,7 +99,7 @@ export const CounselDisclosureModal: React.FC<CounselDisclosureModalProps> = ({
             <View style={styles.actions}>
               <Button
                 label="Continue →"
-                variant="primary"
+                variant="premium"
                 fullWidth
                 onPress={() => setStep('consent')}
               />
@@ -156,7 +156,7 @@ export const CounselDisclosureModal: React.FC<CounselDisclosureModalProps> = ({
             <View style={styles.actions}>
               <Button
                 label="I understand — Start chatting"
-                variant="primary"
+                variant="premium"
                 fullWidth
                 onPress={handleAccept}
               />

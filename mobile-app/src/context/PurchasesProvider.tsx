@@ -35,8 +35,10 @@ export function PurchasesProvider({ children }: Props) {
   const { user, isAnonymous } = useAuth()
   const [isReady, setIsReady] = useState(false)
   const [customerInfo, setCustomerInfo] = useState<CustomerInfo | null>(null)
-  const [currentOffering, setCurrentOffering] = useState<PurchasesOffering | null>(null)
-  const [calendarProduct, setCalendarProduct] = useState<PurchasesStoreProduct | null>(null)
+  const [currentOffering,           setCurrentOffering]           = useState<PurchasesOffering | null>(null)
+  const [boostPacksOffering,         setBoostPacksOffering]         = useState<PurchasesOffering | null>(null)
+  const [compatibilityAddonOffering, setCompatibilityAddonOffering] = useState<PurchasesOffering | null>(null)
+  const [calendarProduct,            setCalendarProduct]            = useState<PurchasesStoreProduct | null>(null)
 
   // Initialize SDK once
   useEffect(() => {
@@ -72,6 +74,8 @@ export function PurchasesProvider({ children }: Props) {
         try {
           const offerings = await Purchases.getOfferings()
           setCurrentOffering(offerings.current)
+          setBoostPacksOffering(offerings.all['counsel_boosts'] ?? null)
+          setCompatibilityAddonOffering(offerings.all['addons'] ?? null)
         } catch (offeringsErr) {
           console.warn('[Purchases] failed to fetch offerings:', offeringsErr)
         }
@@ -138,6 +142,8 @@ export function PurchasesProvider({ children }: Props) {
         try {
           const offerings = await Purchases.getOfferings()
           setCurrentOffering(offerings.current)
+          setBoostPacksOffering(offerings.all['counsel_boosts'] ?? null)
+          setCompatibilityAddonOffering(offerings.all['addons'] ?? null)
         } catch (offeringsErr) {
           console.warn('[Purchases] failed to fetch offerings after logIn:', offeringsErr)
         }
@@ -169,6 +175,34 @@ export function PurchasesProvider({ children }: Props) {
     }
   }, [])
 
+  const purchaseBoostPack = useCallback(async (packageIdentifier: 'spark' | 'insight' | 'ascend'): Promise<MakePurchaseResult> => {
+    if (!boostPacksOffering) {
+      throw new Error('Counsel boost packs are not available. Please try again in a moment, or contact support@omenora.com if this persists.')
+    }
+    const pkg = boostPacksOffering.availablePackages.find(p => p.identifier === packageIdentifier)
+    if (!pkg) {
+      throw new Error(`Boost pack "${packageIdentifier}" not found in the current offering. Please contact support@omenora.com.`)
+    }
+    const result = await Purchases.purchasePackage(pkg)
+    await refreshCustomerInfo()
+    return result
+  }, [boostPacksOffering, refreshCustomerInfo])
+
+  const purchaseCompatibilitySingle = useCallback(async (): Promise<MakePurchaseResult> => {
+    if (!compatibilityAddonOffering) {
+      throw new Error('Single compatibility reading is not available. Please try again in a moment, or contact support@omenora.com if this persists.')
+    }
+    const pkg = compatibilityAddonOffering.availablePackages.find(
+      p => p.product.identifier === 'omenora_compatibility_single'
+    )
+    if (!pkg) {
+      throw new Error('Single compatibility reading product not found in the addons offering. Please contact support@omenora.com.')
+    }
+    const result = await Purchases.purchasePackage(pkg)
+    await refreshCustomerInfo()
+    return result
+  }, [compatibilityAddonOffering, refreshCustomerInfo])
+
   const purchaseCalendar = useCallback(async (): Promise<MakePurchaseResult> => {
     const products = await Purchases.getProducts(
       ['omenora_calendar_2026'],
@@ -182,6 +216,12 @@ export function PurchasesProvider({ children }: Props) {
     const result = await Purchases.purchaseStoreProduct(products[0])
     await refreshCustomerInfo()
     return result
+  }, [refreshCustomerInfo])
+
+  const restorePurchases = useCallback(async (): Promise<CustomerInfo> => {
+    const restored = await Purchases.restorePurchases()
+    await refreshCustomerInfo()
+    return restored
   }, [refreshCustomerInfo])
 
   const presentCustomerCenter = useCallback(async (): Promise<void> => {
@@ -219,10 +259,15 @@ export function PurchasesProvider({ children }: Props) {
         customerInfo,
         currentOffering,
         calendarProduct,
+        boostPacksOffering,
+        compatibilityAddonOffering,
         refreshCustomerInfo,
         presentPaywall,
         presentPaywallIfNeeded,
         purchaseCalendar,
+        restorePurchases,
+        purchaseBoostPack,
+        purchaseCompatibilitySingle,
         presentCustomerCenter,
       }}
     >
