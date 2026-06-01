@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { View, StyleSheet, ViewStyle, LayoutChangeEvent } from 'react-native'
 import { LinearGradient } from 'expo-linear-gradient'
 import Decor, { DecorTone } from '../atmosphere/Decor'
-import { cardTokens, radius, layout } from '../../design/tokens'
+import { cardTokens, cardShadow, cardHighlight, radius, layout } from '../../design/tokens'
 
 export interface CardProps {
   /**
@@ -40,78 +40,73 @@ function resolveVariant(v: NonNullable<CardProps['variant']>): 'content' | 'elev
   }
 }
 
-// ── Solid variant configs ─────────────────────────────────────────────────────
-type SolidConfig = {
-  kind:            'solid'
-  backgroundColor: string
-  borderWidth:     number
-  borderColor:     string
-  borderRadius:    number
+// ── Gradient configs for content + elevated (micro-gradient) ────────────────
+type GradientTierConfig = {
+  gradient:     [string, string]
+  borderColor:  string
+  shadowTier:   'content' | 'elevated'
+  highlightTier: 'content' | 'elevated'
 }
 
-const solidConfig: Record<'content' | 'elevated' | 'locked', SolidConfig> = {
+const gradientTierConfig: Record<'content' | 'elevated', GradientTierConfig> = {
   content: {
-    kind:            'solid',
-    backgroundColor: cardTokens.background.content,
-    borderWidth:     1,
-    borderColor:     cardTokens.border.content,
-    borderRadius:    radius.lg,
+    gradient:      cardTokens.background.contentGradient,
+    borderColor:   cardTokens.border.content,
+    shadowTier:    'content',
+    highlightTier: 'content',
   },
   elevated: {
-    kind:            'solid',
-    backgroundColor: cardTokens.background.elevated,
-    borderWidth:     1,
-    borderColor:     cardTokens.border.elevated,
-    borderRadius:    radius.lg,
-  },
-  locked: {
-    kind:            'solid',
-    backgroundColor: cardTokens.background.locked,
-    borderWidth:     0,
-    borderColor:     cardTokens.border.locked,
-    borderRadius:    radius.lg,
+    gradient:      cardTokens.background.elevatedGradient,
+    borderColor:   cardTokens.border.elevated,
+    shadowTier:    'elevated',
+    highlightTier: 'elevated',
   },
 }
 
-// ── Gradient variant configs ──────────────────────────────────────────────────
-type GradientConfig = {
-  kind:         'gradient'
+// ── Locked: intentionally flat (communicates inaccessible/inert state) ───────
+const lockedConfig = {
+  backgroundColor: cardTokens.background.locked,
+  borderRadius:    radius.lg,
+}
+
+// ── Premium/featured/accent-rust gradient configs ────────────────────────────
+type SpecialGradientConfig = {
   colors:       [string, string]
-  borderRadius: number
+  borderColor:  string
+  start:        { x: number; y: number }
+  end:          { x: number; y: number }
+  shadowTier:   'content' | 'elevated' | 'premium'
+  highlightTier: 'content' | 'elevated' | 'premium'
 }
 
-type GradientConfigFull = GradientConfig & {
-  start: { x: number; y: number }
-  end:   { x: number; y: number }
-}
-
-const gradientConfig: Record<'premium' | 'featured' | 'accent-rust', GradientConfigFull> = {
+const specialGradientConfig: Record<'premium' | 'featured' | 'accent-rust', SpecialGradientConfig> = {
   premium: {
-    kind:         'gradient',
-    colors:       cardTokens.background.premiumGradient,
-    borderRadius: radius.lg,
-    start:        { x: 0.5, y: -0.15 },
-    end:          { x: 0.5, y: 1 },
+    colors:        cardTokens.background.premiumGradient,
+    borderColor:   cardTokens.border.premium,
+    start:         { x: 0.5, y: -0.15 },
+    end:           { x: 0.5, y: 1 },
+    shadowTier:    'premium',
+    highlightTier: 'premium',
   },
   featured: {
-    kind:         'gradient',
-    colors:       cardTokens.background.featuredGradient,
-    borderRadius: radius.lg,
-    start:        { x: 0.5, y: -0.15 },
-    end:          { x: 0.5, y: 1 },
+    colors:        cardTokens.background.featuredGradient,
+    borderColor:   cardTokens.border.featured,
+    start:         { x: 0.5, y: -0.15 },
+    end:           { x: 0.5, y: 1 },
+    shadowTier:    'elevated',
+    highlightTier: 'elevated',
   },
   'accent-rust': {
-    kind:         'gradient',
-    colors:       cardTokens.background.accentRustGradient,
-    borderRadius: radius.lg,
-    start:        { x: 0, y: 0 },
-    end:          { x: 0, y: 1 },
+    colors:        cardTokens.background.accentRustGradient,
+    borderColor:   cardTokens.border.accentRust,
+    start:         { x: 0, y: 0 },
+    end:           { x: 0, y: 1 },
+    shadowTier:    'elevated',
+    highlightTier: 'content',
   },
 }
 
-// Guilloché rosette tone per gradient variant.
-// Bronze sings on the premium charcoal surface; warm copper & rust use light tone.
-// Solid variants carry no decor — restraint reads as premium.
+// Guilloché rosette tone per gradient variant — only special gradient variants carry decor
 const decorTone: Record<'premium' | 'featured' | 'accent-rust', DecorTone> = {
   premium:       'gold',
   featured:      'light',
@@ -139,18 +134,47 @@ export const Card: React.FC<CardProps> = ({
     setCardH(e.nativeEvent.layout.height)
   }
 
-  if (canonical === 'premium' || canonical === 'featured' || canonical === 'accent-rust') {
-    const cfg = gradientConfig[canonical]
-    const cardBorder = canonical === 'premium'
-      ? { borderWidth: 1, borderColor: cardTokens.border.premium }
-      : {}
+  // ── Locked: flat, no shadow, no highlight (communicates inert state) ─────
+  if (canonical === 'locked') {
     return (
-      <View style={[{ borderRadius: cfg.borderRadius, overflow: 'hidden' }, cardBorder, style]} onLayout={onLayout}>
+      <View
+        onLayout={onLayout}
+        style={[
+          outerBase,
+          styles.shell,  // overflow:hidden fine here — no shadow on locked
+          { backgroundColor: lockedConfig.backgroundColor, borderRadius: lockedConfig.borderRadius },
+          style,
+        ]}
+      >
+        <View style={{ padding: pad }}>{children}</View>
+      </View>
+    )
+  }
+
+  // ── Special gradient variants: premium / featured / accent-rust ───────────
+  if (canonical === 'premium' || canonical === 'featured' || canonical === 'accent-rust') {
+    const cfg = specialGradientConfig[canonical]
+    const shadow = cardShadow[cfg.shadowTier]
+    const highlight = cardHighlight[cfg.highlightTier]
+    return (
+      <View
+        onLayout={onLayout}
+        style={[
+          outerBase,
+          {
+            borderRadius: radius.lg,
+            borderWidth:  cfg.borderColor !== 'transparent' ? 1 : 0,
+            borderColor:  cfg.borderColor,
+          },
+          shadow,
+          style,
+        ]}
+      >
         <LinearGradient
           colors={cfg.colors}
           start={cfg.start}
           end={cfg.end}
-          style={styles.shell}
+          style={[styles.shell, { borderRadius: radius.lg }]}
         >
           {cardW > 0 && (
             <Decor
@@ -161,38 +185,59 @@ export const Card: React.FC<CardProps> = ({
               height={cardH}
             />
           )}
-          <View style={{ padding: pad }}>
-            {children}
-          </View>
+          {/* Top-edge highlight — 1px ambient light catch */}
+          <View style={[styles.topHighlight, { backgroundColor: highlight }]} />
+          <View style={{ padding: pad }}>{children}</View>
         </LinearGradient>
       </View>
     )
   }
 
-  const cfg = solidConfig[canonical]
+  // ── Content + elevated: micro-gradient fill ───────────────────────────────
+  const cfg = gradientTierConfig[canonical as 'content' | 'elevated']
+  const shadow = cardShadow[cfg.shadowTier]
+  const highlight = cardHighlight[cfg.highlightTier]
   return (
     <View
       onLayout={onLayout}
       style={[
-        styles.shell,
+        outerBase,
         {
-          backgroundColor: cfg.backgroundColor,
-          borderRadius:    cfg.borderRadius,
-          borderWidth:     cfg.borderWidth,
-          borderColor:     cfg.borderColor,
+          borderRadius: radius.lg,
+          borderWidth:  1,
+          borderColor:  cfg.borderColor,
         },
+        shadow,
         style,
       ]}
     >
-      <View style={{ padding: pad }}>
-        {children}
-      </View>
+      <LinearGradient
+        colors={cfg.gradient}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 1 }}
+        style={[styles.shell, { borderRadius: radius.lg }]}
+      >
+        {/* Top-edge highlight — 1px ambient light catch */}
+        <View style={[styles.topHighlight, { backgroundColor: highlight }]} />
+        <View style={{ padding: pad }}>{children}</View>
+      </LinearGradient>
     </View>
   )
 }
 
 const styles = StyleSheet.create({
   shell: {
-    overflow: 'hidden',  // clips border-radius on child content
+    overflow: 'hidden',  // clips border-radius on child content — INNER only
+  },
+  topHighlight: {
+    position:   'absolute',
+    top:        0,
+    left:       0,
+    right:      0,
+    height:     1,
+    zIndex:     1,
   },
 })
+
+// Outer wrapper style — NO overflow:hidden (shadows are clipped otherwise on iOS)
+const outerBase: ViewStyle = { flex: 0 }
