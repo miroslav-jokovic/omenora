@@ -225,18 +225,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: layout.screenPadding,
   },
   topBar: {
-    paddingTop:  space['8'],        // 32px — generous masthead breathing room
+    paddingTop:  space['5'],        // 20px — tighter masthead, more room for content
     alignItems:  'center',
   },
   logoMark: {
-    width:  52,
-    height: 52,
+    width:  60,
+    height: 60,
   },
   headlineZone: {
     flex:              1,
-    paddingTop:        space['10'], // 40px — headline sits in upper third
     paddingHorizontal: space['2'],  // 8px extra inset on top of screenPadding
-    justifyContent:    'flex-start',
+    justifyContent:    'center',    // vertically centre headline in available space
+    alignItems:        'center',
   },
   eyebrow: {
     // letterSpacing comes from typeScale.eyebrow (tracking.caps = 2.0)
@@ -257,8 +257,8 @@ const styles = StyleSheet.create({
     paddingBottom: space['6'],       // 24px — safe area already covers system bar
   },
   subheadline: {
-    marginBottom: space['8'],        // 32px separation before CTA
-    textAlign:    'center',          // no extra paddingHorizontal — screenPadding is sufficient
+    marginBottom: space['6'],        // 24px separation before CTA
+    textAlign:    'center',
   },
   actions: {
     gap:          space['3'],
