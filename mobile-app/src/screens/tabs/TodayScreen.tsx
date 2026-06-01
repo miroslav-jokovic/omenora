@@ -283,7 +283,7 @@ export default function TodayScreen({ navigation }: TodayScreenProps) {
 const styles = StyleSheet.create({
   root: {
     flex:            1,
-    backgroundColor: tokens.surface.base,
+    backgroundColor: tokens.surface.deep,
   },
   safe: {
     flex: 1,

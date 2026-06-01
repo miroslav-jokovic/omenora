@@ -2,9 +2,8 @@ import React from 'react'
 import { View, ImageBackground, StyleSheet, ViewStyle } from 'react-native'
 import { LinearGradient } from 'expo-linear-gradient'
 import { Text } from '../atoms/Text'
-import { ArchetypeIcon } from '../atoms/ArchetypeIcon'
 import { ZodiacSymbol } from '../atoms/ZodiacSymbol'
-import { accent, specialty, text } from '../../design/tokens/colors'
+import { specialty, text } from '../../design/tokens/colors'
 import { space } from '../../design/tokens/spacing'
 
 const PHASE_IMAGES: Record<string, number> = {
@@ -22,16 +21,15 @@ const FALLBACK_IMAGE = PHASE_IMAGES['New Moon']
 
 export interface MoonPhaseHeroProps {
   moonPhase:     string
-  archetypeName: string
-  signName:      string | null
-  greeting:      string
-  formattedDate: string
-  style?:        ViewStyle
+  archetypeName?: string
+  signName:       string | null
+  greeting:       string
+  formattedDate:  string
+  style?:         ViewStyle
 }
 
 export default function MoonPhaseHero({
   moonPhase,
-  archetypeName,
   signName,
   greeting,
   formattedDate,
@@ -68,16 +66,6 @@ export default function MoonPhaseHero({
           <Text variant="subMicro" style={styles.phaseCaptionText}>
             {moonPhase.toUpperCase()}
           </Text>
-        </View>
-
-        {/* Archetype icon — centered horizontally, biased upward */}
-        <View style={styles.archetypeWrap}>
-          <ArchetypeIcon
-            archetype={archetypeName}
-            size={120}
-            fill={accent.primary}
-            opacity={0.55}
-          />
         </View>
 
         {/* Greeting + date — bottom-left */}
@@ -119,17 +107,9 @@ const styles = StyleSheet.create({
     right:    space['5'],
   },
   phaseCaptionText: {
-    color:         accent.primary,
-    opacity:       0.75,
+    color:         text.primary,
+    opacity:       0.70,
     letterSpacing: 1.2,
-  },
-  archetypeWrap: {
-    position:        'absolute',
-    top:             space['4'],
-    left:            0,
-    right:           0,
-    alignItems:      'center',
-    justifyContent:  'center',
   },
   greetingBlock: {
     position: 'absolute',
@@ -139,9 +119,10 @@ const styles = StyleSheet.create({
   },
   greetingRow: {
     flexDirection: 'row',
-    alignItems:    'center',
+    alignItems:    'flex-end',
   },
   greetingText: {
+    flex:  1,  // prevents zodiac symbol overflow on long names
     color: text.primary,
   },
   zodiacSymbol: {

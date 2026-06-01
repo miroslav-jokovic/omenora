@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { View, ScrollView, Alert, Linking, Image, StyleSheet } from 'react-native'
+import { View, ScrollView, Alert, Linking, StyleSheet } from 'react-native'
+import { SvgXml } from 'react-native-svg'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { CommonActions } from '@react-navigation/native'
 import Constants from 'expo-constants'
@@ -33,7 +34,16 @@ import { tokens, space, layout } from '../../design/tokens'
 import { AtmosphericBackground } from '../../components/atmosphere'
 import type { MoreScreenProps } from '../../navigation/types'
 
-const CARD_BG = 'rgba(42,31,24,0.40)'
+// Omenora logomark — same inline SVG used by WelcomeScreen
+const LOGO_FILL = '#F2EDE5'
+const LOGO_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 301.62 499.33">
+  <polygon fill="${LOGO_FILL}" points="301.62 210.03 234.96 187.05 174.86 114.93 150.08 0 301.62 210.03"/>
+  <polygon fill="${LOGO_FILL}" points="150.08 499.33 0 214 79.78 195.77 150.08 499.33"/>
+  <path fill="${LOGO_FILL}" d="M301.62,210.03l-151.54,289.29c3.2-86.22,39.95-196.34,84.88-312.28l66.66,22.98Z" opacity="0.75"/>
+  <polygon fill="${LOGO_FILL}" points="150.08 0 79.78 195.77 0 214 150.08 0" opacity="0.55"/>
+  <polygon fill="${LOGO_FILL}" points="174.86 114.93 79.78 195.77 150.08 0 174.86 114.93" opacity="0.88"/>
+  <path fill="${LOGO_FILL}" d="M234.96,187.05c-44.93,115.94-81.68,226.06-84.88,312.28L79.78,195.77l95.08-80.84,60.11,72.12Z" opacity="0.65"/>
+</svg>`
 
 export default function MoreScreen({ navigation }: MoreScreenProps) {
   const { languageOverride } = useProfileStore()
@@ -108,16 +118,16 @@ export default function MoreScreen({ navigation }: MoreScreenProps) {
       >
         {/* ── Brand logo mark ────────────────────────────────────────── */}
         <View style={styles.logoBlock}>
-          <Image
-            source={require('../../../assets/icon.png')}
-            style={styles.logoMark}
-            resizeMode="contain"
+          <SvgXml
+            xml={LOGO_SVG}
+            width={styles.logoMark.width}
+            height={styles.logoMark.height}
             accessibilityLabel="Omenora"
           />
         </View>
 
         {/* ── Account header ─────────────────────────────────────────── */}
-        <Card variant="default" padding="default" style={{ backgroundColor: CARD_BG }}>
+        <Card variant="content" padding="default">
           <Text variant="heading2" color="primary">Account</Text>
           <View style={styles.accountSubRow}>
             <View style={styles.accountIdentity}>
@@ -143,7 +153,7 @@ export default function MoreScreen({ navigation }: MoreScreenProps) {
           <Text variant="micro" color="tertiary" style={styles.sectionHeading}>
             Premium Features
           </Text>
-          <Card variant="default" style={{ ...styles.listCard, backgroundColor: CARD_BG }}>
+          <Card variant="content" style={styles.listCard}>
             <ListItem
               icon={Heart}
               label="Compatibility"
@@ -172,7 +182,7 @@ export default function MoreScreen({ navigation }: MoreScreenProps) {
           <Text variant="micro" color="tertiary" style={styles.sectionHeading}>
             Account &amp; Settings
           </Text>
-          <Card variant="default" style={{ ...styles.listCard, backgroundColor: CARD_BG }}>
+          <Card variant="content" style={styles.listCard}>
             {/* Sign-in CTA — only visible for anonymous users */}
             {isAnonymous && (
               <>
@@ -226,7 +236,7 @@ export default function MoreScreen({ navigation }: MoreScreenProps) {
           <Text variant="micro" color="tertiary" style={styles.sectionHeading}>
             Trust &amp; Compliance
           </Text>
-          <Card variant="default" style={{ ...styles.listCard, backgroundColor: CARD_BG }}>
+          <Card variant="content" style={styles.listCard}>
             {/* navigate() not Linking — web /privacy URL doesn't exist yet */}
             <ListItem
               icon={Shield}
@@ -281,7 +291,7 @@ export default function MoreScreen({ navigation }: MoreScreenProps) {
           <Text variant="micro" color="tertiary" style={styles.sectionHeading}>
             Support
           </Text>
-          <Card variant="default" style={{ ...styles.listCard, backgroundColor: CARD_BG }}>
+          <Card variant="content" style={styles.listCard}>
             {/* /faq page does not exist on web yet — disabled until it ships */}
             <ListItem
               icon={HelpCircle}
@@ -311,7 +321,7 @@ export default function MoreScreen({ navigation }: MoreScreenProps) {
             <Text variant="micro" color="tertiary" style={styles.sectionHeading}>
               Developer (dev-only)
             </Text>
-            <Card variant="default" style={{ ...styles.listCard, backgroundColor: CARD_BG }}>
+            <Card variant="content" style={styles.listCard}>
               <ListItem
                 icon={Layers}
                 label="Component Gallery"
@@ -337,7 +347,7 @@ export default function MoreScreen({ navigation }: MoreScreenProps) {
 const styles = StyleSheet.create({
   root: {
     flex:            1,
-    backgroundColor: tokens.surface.base,
+    backgroundColor: tokens.surface.deep,
   },
   safe: {
     flex: 1,
@@ -377,7 +387,6 @@ const styles = StyleSheet.create({
   logoMark: {
     width:   40,
     height:  40,
-    opacity: 0.75,
   },
   sectionHeading: {
     marginBottom: space['2'],
