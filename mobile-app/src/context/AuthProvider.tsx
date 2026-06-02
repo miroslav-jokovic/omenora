@@ -46,6 +46,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         if (currentSession) {
           setSession(currentSession)
+          // Stamp the profile store with the owning user id so the SplashScreen
+          // identity guard can detect cross-identity stale persisted data.
+          useProfileStore.getState().setAnonymousUserId(currentSession.user.id)
         } else {
           // No session — create anonymous user.
           const { data, error } = await supabase.auth.signInAnonymously()
@@ -53,6 +56,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             console.error('[Auth] anonymous sign-in failed:', error.message)
           } else if (mounted) {
             setSession(data.session)
+            if (data.session?.user?.id) {
+              useProfileStore.getState().setAnonymousUserId(data.session.user.id)
+            }
           }
         }
       } catch (err) {
@@ -70,6 +76,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // Capture anonymous user ID when bootstrap completes
       if (newSession?.user?.is_anonymous) {
         previousAnonymousUserIdRef.current = newSession.user.id
+        // Keep the profile store stamped with the current owning session id.
+        useProfileStore.getState().setAnonymousUserId(newSession.user.id)
       }
 
       // On permanent sign-in: transfer anonymous data (first-time) then hydrate profileStore

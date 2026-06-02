@@ -100,11 +100,29 @@ export default function SplashScreen() {
     if (hasNavigatedRef.current) return
     hasNavigatedRef.current = true
 
-    let destination: 'MainTabs' | 'Welcome' | 'SaveYourReading' = profileComplete ? 'MainTabs' : 'Welcome'
+    // ── Cross-identity stale-data guard ─────────────────────────────────────
+    // If the persisted profile was written by a different user (different or expired
+    // session, prior install, reinstall), clear it before routing so the stale
+    // archetype/dateOfBirth/sunSign cannot gate MainTabs for the wrong identity.
+    // A brand-new install has anonymousUserId === '' — safe: profileComplete will
+    // also be false so no spurious reset; but we guard it explicitly too.
+    const store = useProfileStore.getState()
+    const persistedOwner = store.anonymousUserId
+    const currentUserId  = session.user.id
+    if (persistedOwner !== '' && persistedOwner !== currentUserId) {
+      store.reset()
+    }
+
+    // Read profileComplete fresh from store — the closure value may be stale if reset()
+    // just fired above (Zustand state is synchronously updated, selector re-reads it).
+    const { archetype, dateOfBirth, sunSign } = useProfileStore.getState()
+    const isProfileComplete = archetype !== null && dateOfBirth !== '' && sunSign !== null
+
+    let destination: 'MainTabs' | 'Welcome' | 'SaveYourReading' = isProfileComplete ? 'MainTabs' : 'Welcome'
 
     // Re-prompt anonymous users who previously declined SaveYourReading:
     // — up to 3 total declines, spaced at least 24h apart.
-    if (profileComplete && destination === 'MainTabs') {
+    if (isProfileComplete && destination === 'MainTabs') {
       const { saveDeclineCount, saveLastDeclinedAt } = useProfileStore.getState()
       const isAnon = (session.user as any)?.is_anonymous ?? true
       const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000
