@@ -9,7 +9,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { MessageCircle, BookOpen } from 'lucide-react-native'
 import { Text, DimensionIcon } from '../../components/atoms'
-import { Card } from '../../components/organisms'
+import { Card, LockedCard } from '../../components/organisms'
 import MoonPhaseHero from '../../components/hero/MoonPhaseHero'
 import { AtmosphericBackground } from '../../components/atmosphere'
 import { ErrorState } from '../../components/templates/ErrorState'
@@ -25,7 +25,7 @@ import type { TodayScreenProps } from '../../navigation/types'
 export default function TodayScreen({ navigation }: TodayScreenProps) {
   const { firstName, archetype, sunSign, languageOverride } = useProfileStore()
   const { displayName } = useAuth()
-  const { isPremium } = usePurchases()
+  const { isPremium, presentPaywall } = usePurchases()
 
   const [data, setData]           = useState<GetDailyCacheResponse | null>(null)
   const [loading, setLoading]     = useState(true)
@@ -180,8 +180,8 @@ export default function TodayScreen({ navigation }: TodayScreenProps) {
           </Text>
         </View>
 
-        {/* ── 3. Dimension cards — Love, Work, Health (zodiac only) ── */}
-        {zodiacContent != null && (
+        {/* ── 3. Dimension cards — Love, Work, Health (zodiac only) — PREMIUM ── */}
+        {isPremium && zodiacContent != null && (
           <>
             <Card variant="content" padding="default">
               <View style={styles.dimensionRow}>
@@ -213,18 +213,20 @@ export default function TodayScreen({ navigation }: TodayScreenProps) {
           </>
         )}
 
-        {/* ── 4. Reflection Card — free ──────────────────────── */}
-        <Card variant="content" padding="default">
-          <Text variant="micro" color="tertiary" style={styles.sectionLabel}>
-            Reflection
-          </Text>
-          <Text variant="body" color="secondary" style={styles.reflectionText}>
-            {archetypeContent.reflection}
-          </Text>
-        </Card>
+        {/* ── 4. Reflection Card — PREMIUM ──────────────────────── */}
+        {isPremium && (
+          <Card variant="content" padding="default">
+            <Text variant="micro" color="tertiary" style={styles.sectionLabel}>
+              Reflection
+            </Text>
+            <Text variant="body" color="secondary" style={styles.reflectionText}>
+              {archetypeContent.reflection}
+            </Text>
+          </Card>
+        )}
 
-        {/* ── 5. Planetary weather — free (only if zodiac available) ─── */}
-        {zodiacContent != null && (
+        {/* ── 5. Planetary weather — PREMIUM (only if zodiac available) ─── */}
+        {isPremium && zodiacContent != null && (
           <Card variant="content" padding="compact">
             <Text variant="micro" color="tertiary" style={styles.sectionLabel}>
               Today's cosmic stage
@@ -253,25 +255,25 @@ export default function TodayScreen({ navigation }: TodayScreenProps) {
           </Card>
         )}
 
-        {/* ── 7. Deeper insight — PREMIUM ───────────────────── */}
-        {/* TODO: 17f-paywall — re-render after paywall cluster ships */}
-        {/* <LockedCard
-          placement="feature_archetype_today"
-          title="Your Full Daily Reading"
-          description="Deeper context on today's cosmic stage, your karmic patterns, and the energetic invitation hidden in this transit."
-          onUnlockPress={async () => { await presentPaywall() }}
-        /> */}
+        {/* ── 7. Deeper insight — LockedCard for free users ─── */}
+        {!isPremium && (
+          <LockedCard
+            placement="feature_archetype_today"
+            title="Your Full Daily Reading"
+            description="Deeper context on today's cosmic stage, your karmic patterns, and the energetic invitation hidden in this transit."
+            onUnlockPress={async () => { await presentPaywall() }}
+          />
+        )}
 
-        {/* ── 8. Today's Dimensions — PREMIUM (only if zodiac) ──────── */}
-        {/* TODO: 17f-paywall — re-render after paywall cluster ships */}
-        {/* {zodiacContent != null && (
+        {/* ── 8. Today's Dimensions — LockedCard for free users (only if zodiac) ── */}
+        {!isPremium && zodiacContent != null && (
           <LockedCard
             placement="feature_dimensions_today"
             title="Today's Life Dimensions"
             description="Career, love, and wellbeing — personalized guidance for each dimension based on your full chart and today's transits."
             onUnlockPress={async () => { await presentPaywall() }}
           />
-        )} */}
+        )}
       </ScrollView>
       </SafeAreaView>
     </View>
