@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import { Modal, Platform, Pressable, View, StyleSheet, ViewStyle } from 'react-native'
 import { BlurView } from 'expo-blur'
 import DateTimePicker, { DateTimePickerAndroid } from '@react-native-community/datetimepicker'
@@ -35,6 +35,7 @@ export const TimeField: React.FC<TimeFieldProps> = ({
 }) => {
   const [showModal, setShowModal] = useState(false)
   const [tempValue, setTempValue] = useState<Date>(value ?? new Date())
+  const pickedValueRef = useRef<Date | null>(null)
   const [unknownEnabled, setUnknownEnabled] = useState(showUnknownToggle && value === null)
 
   const resolvedLabel = label != null ? (required ? `${label} *` : label) : undefined
@@ -54,13 +55,15 @@ export const TimeField: React.FC<TimeFieldProps> = ({
         },
       })
     } else {
-      setTempValue(value ?? new Date())
+      const seed = value ?? new Date()
+      setTempValue(seed)
+      pickedValueRef.current = null
       setShowModal(true)
     }
   }
 
   const handleDone = () => {
-    onChange(tempValue)
+    onChange(pickedValueRef.current ?? tempValue)
     setShowModal(false)
   }
 
@@ -161,7 +164,7 @@ export const TimeField: React.FC<TimeFieldProps> = ({
                 themeVariant="dark"
                 style={styles.picker}
                 onChange={(_event: DateTimePickerEvent, date?: Date) => {
-                  if (date != null) setTempValue(date)
+                  if (date != null) pickedValueRef.current = date
                 }}
               />
             </BlurView>
