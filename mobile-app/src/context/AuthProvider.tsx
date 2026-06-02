@@ -348,8 +348,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [])
 
-  const resetProfile      = useProfileStore((s) => s.reset)
   const profileFirstName   = useProfileStore((s) => s.firstName)
+  const resetProfile       = useProfileStore((s) => s.reset)
 
   const signOut = useCallback(async (options?: { skipWarning?: boolean }) => {
     const performSignOut = async () => {
@@ -405,7 +405,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         { text: 'Sign Out', style: 'destructive', onPress: performSignOut },
       ],
     )
-  }, [resetProfile])
+  }, [])
 
   const showAuthGate = useCallback((options?: { title?: string; body?: string }) => {
     const currentSession = session
@@ -449,23 +449,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         throw new Error((errorData as any).message || 'Account deletion failed')
       }
 
-      // c. RevenueCat sign out (best-effort — non-blocking)
+      // Backend delete succeeded — remaining steps are best-effort cleanup.
+      // Errors here must NOT surface to the user; the deletion is authoritative.
       try {
-        await Purchases.logOut()
-      } catch (rcErr) {
-        console.warn('[Auth] Purchases.logOut failed (non-blocking):', rcErr)
+        // c. RevenueCat sign out
+        try {
+          await Purchases.logOut()
+        } catch (rcErr) {
+          console.warn('[Auth] Purchases.logOut failed (non-blocking):', rcErr)
+        }
+
+        // d. Apple token revocation — expo-apple-authentication ~7.2.4 has no
+        //    revokeAsync API. Follow-up required: server-side revoke via
+        //    Apple REST API POST /auth/revoke using the stored refresh token.
+
+        // e. Clear all local profile/store data
+        resetProfile()
+
+        // f. Sign out locally — session is invalid, onAuthStateChange will
+        //    fire SIGNED_OUT and bootstrap a new anonymous user.
+        await supabase.auth.signOut()
+      } catch (cleanupErr: any) {
+        console.warn('[Auth] deleteAccount cleanup error (non-blocking):', cleanupErr?.message)
       }
-
-      // d. Apple token revocation — expo-apple-authentication ~7.2.4 has no
-      //    revokeAsync API. Follow-up required: server-side revoke via
-      //    Apple REST API POST /auth/revoke using the stored refresh token.
-
-      // e. Clear all local profile/store data
-      resetProfile()
-
-      // f. Sign out locally — session is invalid, onAuthStateChange will
-      //    fire SIGNED_OUT and bootstrap a new anonymous user.
-      await supabase.auth.signOut()
     } catch (err: any) {
       console.error('[Auth] deleteAccount failed:', err?.message)
       Alert.alert(
