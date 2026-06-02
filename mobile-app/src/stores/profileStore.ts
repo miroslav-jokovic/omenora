@@ -72,6 +72,10 @@ export interface ProfileState {
   setSaveDeclineCount: (count: number) => void;
   setSaveLastDeclinedAt: (ts: number | null) => void;
 
+  // Boost-pack post-purchase upsell frequency cap
+  boostUpsellDismissedAt: number | null;
+  setBoostUpsellDismissedAt: (ts: number | null) => void;
+
   // Analytics preferences
   analyticsEnabled: boolean;
   setAnalyticsEnabled: (enabled: boolean) => void;
@@ -138,6 +142,7 @@ const initialState = {
   pendingServerSync: false,
   saveDeclineCount: 0,
   saveLastDeclinedAt: null,
+  boostUpsellDismissedAt: null,
 };
 
 export const useProfileComplete = () =>
@@ -176,6 +181,7 @@ export const useProfileStore = create<ProfileState>()(
       setHasAcceptedCounselDisclosure: (hasAcceptedCounselDisclosure) => set({ hasAcceptedCounselDisclosure }),
       setSaveDeclineCount: (saveDeclineCount) => set({ saveDeclineCount }),
       setSaveLastDeclinedAt: (saveLastDeclinedAt) => set({ saveLastDeclinedAt }),
+      setBoostUpsellDismissedAt: (boostUpsellDismissedAt) => set({ boostUpsellDismissedAt }),
 
       setAnalyticsEnabled: (analyticsEnabled) => set({ analyticsEnabled }),
 
@@ -271,6 +277,7 @@ export const useProfileStore = create<ProfileState>()(
         pendingServerSync: state.pendingServerSync,
         saveDeclineCount: state.saveDeclineCount,
         saveLastDeclinedAt: state.saveLastDeclinedAt,
+        boostUpsellDismissedAt: state.boostUpsellDismissedAt,
       }),
     }
   )

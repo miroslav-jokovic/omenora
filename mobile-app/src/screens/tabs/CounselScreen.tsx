@@ -3,7 +3,7 @@ import { View, ScrollView, StyleSheet } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { MessageCircle } from 'lucide-react-native'
 import { Text, Button } from '../../components/atoms'
-import { BoostPackSheet } from '../../components/molecules'
+import { BoostPackSheet, PostPurchaseUpsellSheet } from '../../components/molecules'
 import type { BoostPackIdentifier } from '../../components/molecules'
 import { useProfileStore } from '../../stores/profileStore'
 import { usePurchases } from '../../context/usePurchases'
@@ -12,9 +12,13 @@ import { AtmosphericBackground } from '../../components/atmosphere'
 import type { CounselScreenProps } from '../../navigation/types'
 
 export default function CounselScreen({ navigation }: CounselScreenProps) {
-  const { sunSign } = useProfileStore()
+  const { sunSign, boostUpsellDismissedAt, setBoostUpsellDismissedAt } = useProfileStore()
   const { isPremium, presentPaywall } = usePurchases()
   const [boostSheetVisible, setBoostSheetVisible] = useState(false)
+  const [upsellPackId, setUpsellPackId] = useState<BoostPackIdentifier | null>(null)
+
+  const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000
+  const upsellVisible = upsellPackId !== null
 
   const sampleQuestions = useMemo(() => [
     "What's coming up for me this week?",
@@ -104,7 +108,34 @@ export default function CounselScreen({ navigation }: CounselScreenProps) {
       <BoostPackSheet
         visible={boostSheetVisible}
         onDismiss={() => setBoostSheetVisible(false)}
-        onPurchaseSuccess={(_packId: BoostPackIdentifier) => {
+        onPurchaseSuccess={(packId: BoostPackIdentifier) => {
+          // Pack is already credited. Show upsell only if: not premium AND
+          // frequency cap allows (null = never dismissed, or > 7 days ago).
+          const recentlyDismissed =
+            boostUpsellDismissedAt !== null &&
+            Date.now() - boostUpsellDismissedAt < SEVEN_DAYS_MS
+          if (!isPremium && !recentlyDismissed) {
+            setUpsellPackId(packId)
+          } else {
+            navigation.navigate('CounselChat')
+          }
+        }}
+      />
+      <PostPurchaseUpsellSheet
+        visible={upsellVisible}
+        packId={upsellPackId ?? 'spark'}
+        onUpgrade={async () => {
+          setUpsellPackId(null)
+          try {
+            await presentPaywall()
+          } catch (err) {
+            console.warn('[Counsel] presentPaywall threw:', err)
+          }
+          navigation.navigate('CounselChat')
+        }}
+        onDismiss={() => {
+          setBoostUpsellDismissedAt(Date.now())
+          setUpsellPackId(null)
           navigation.navigate('CounselChat')
         }}
       />

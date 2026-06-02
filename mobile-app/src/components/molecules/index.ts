@@ -30,3 +30,6 @@ export type { BoostPackSheetProps, BoostPackIdentifier } from './BoostPackSheet'
 
 export { CalendarIAPSheet } from './CalendarIAPSheet'
 export type { CalendarIAPSheetProps } from './CalendarIAPSheet'
+
+export { PostPurchaseUpsellSheet } from './PostPurchaseUpsellSheet'
+export type { PostPurchaseUpsellSheetProps } from './PostPurchaseUpsellSheet'
