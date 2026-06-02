@@ -120,12 +120,16 @@ export const CompatibilityScreen: React.FC<CompatibilityScreenProps> = ({ naviga
   }, [canSubmit, archetype, report, firstName, partnerName, partnerDobDate, partnerCity, languageOverride, lifePathNumber, dateOfBirth, compatibilityAddonOffering, presentPaywall])
 
   const handleUnlockPress = useCallback(async () => {
-    try {
-      await presentPaywall()
-    } catch (err) {
-      console.warn('[Compatibility] presentPaywall threw:', err)
+    if (compatibilityAddonOffering !== null) {
+      setIapSheetVisible(true)
+    } else {
+      try {
+        await presentPaywall()
+      } catch (err) {
+        console.warn('[Compatibility] presentPaywall threw:', err)
+      }
     }
-  }, [presentPaywall])
+  }, [compatibilityAddonOffering, presentPaywall])
 
   const handleReset = useCallback(() => {
     setPartnerName('')
