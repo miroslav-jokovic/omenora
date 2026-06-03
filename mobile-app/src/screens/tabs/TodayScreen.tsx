@@ -260,7 +260,7 @@ export default function TodayScreen({ navigation }: TodayScreenProps) {
           <LockedCard
             placement="feature_archetype_today"
             title="Your Full Daily Reading"
-            description="Deeper context on today's cosmic stage, your karmic patterns, and the energetic invitation hidden in this transit."
+            description="Today's full reading: the cosmic stage you're moving through, a reflection written for your archetype, and the planetary weather shaping your day."
             onUnlockPress={async () => { await presentPaywall() }}
           />
         )}
@@ -270,7 +270,7 @@ export default function TodayScreen({ navigation }: TodayScreenProps) {
           <LockedCard
             placement="feature_dimensions_today"
             title="Today's Life Dimensions"
-            description="Career, love, and wellbeing — personalized guidance for each dimension based on your full chart and today's transits."
+            description="How today lands for your Love, Work, and Health — guidance for each, read from your chart and today's transits."
             onUnlockPress={async () => { await presentPaywall() }}
           />
         )}
