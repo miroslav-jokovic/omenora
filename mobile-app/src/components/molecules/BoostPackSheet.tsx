@@ -20,12 +20,13 @@ type PackMeta = {
   eyebrow: string
   fallbackPrice: string
   recommended: boolean
+  conversations: number
 }
 
 const PACK_META: PackMeta[] = [
-  { id: 'spark',   title: '5 Spark Conversations',   eyebrow: 'TRY A FEW MORE COUNSEL SESSIONS', fallbackPrice: '$1.99', recommended: false },
-  { id: 'insight', title: '15 Insight Conversations', eyebrow: 'MOST POPULAR',                   fallbackPrice: '$4.99', recommended: true  },
-  { id: 'ascend',  title: '35 Ascend Conversations',  eyebrow: 'BEST VALUE — SAVE 28%',           fallbackPrice: '$9.99', recommended: false },
+  { id: 'spark',   title: '5 Spark Conversations',   eyebrow: 'TRY A FEW MORE COUNSEL SESSIONS', fallbackPrice: '$1.99', recommended: false, conversations: 5  },
+  { id: 'insight', title: '15 Insight Conversations', eyebrow: 'MOST POPULAR',                   fallbackPrice: '$4.99', recommended: true,  conversations: 15 },
+  { id: 'ascend',  title: '35 Ascend Conversations',  eyebrow: 'BEST VALUE — SAVE 28%',           fallbackPrice: '$9.99', recommended: false, conversations: 35 },
 ]
 
 export const BoostPackSheet: React.FC<BoostPackSheetProps> = ({
@@ -96,9 +97,14 @@ export const BoostPackSheet: React.FC<BoostPackSheetProps> = ({
                     const isThisPurchasing = isPurchasing === pack.id
                     const isLast         = idx === PACK_META.length - 1
 
+                    const livePkg        = boostPacksOffering?.availablePackages.find(p => p.identifier === pack.id)
+                    const unitPriceLabel = (livePkg != null)
+                      ? `≈ ${new Intl.NumberFormat(undefined, { style: 'currency', currency: livePkg.product.currencyCode, maximumFractionDigits: 2 }).format(livePkg.product.price / pack.conversations)} per conversation`
+                      : null
+
                     return (
                       <React.Fragment key={pack.id}>
-                        <View style={styles.option}>
+                        <View style={[styles.option, pack.recommended && styles.optionRecommended]}>
                           {/* Eyebrow — doubles as "RECOMMENDED" badge for insight */}
                           <Text
                             variant="micro"
@@ -117,6 +123,12 @@ export const BoostPackSheet: React.FC<BoostPackSheetProps> = ({
                           <Text variant="caption" color="secondary" style={styles.optionPrice}>
                             {priceString}
                           </Text>
+
+                          {unitPriceLabel !== null && (
+                            <Text variant="micro" color="tertiary" style={styles.unitPrice}>
+                              {unitPriceLabel}
+                            </Text>
+                          )}
 
                           <Button
                             variant="primary"
@@ -173,6 +185,16 @@ const styles = StyleSheet.create({
   },
   option: {
     gap: space['2'],
+  },
+  optionRecommended: {
+    borderWidth:       1,
+    borderColor:       tokens.border.accent,
+    borderRadius:      radius.lg,
+    backgroundColor:   tokens.accent.subtle,
+    padding:           space['3'],
+  },
+  unitPrice: {
+    marginTop: space['0.5'],
   },
   eyebrow: {
     letterSpacing: 1.5,
