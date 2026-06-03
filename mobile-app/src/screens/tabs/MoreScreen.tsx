@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { View, ScrollView, Alert, Linking, StyleSheet } from 'react-native'
 import { SvgXml } from 'react-native-svg'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -48,20 +48,10 @@ const LOGO_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 301.62 49
 
 export default function MoreScreen({ navigation }: MoreScreenProps) {
   const { languageOverride } = useProfileStore()
-  const { isPremium, presentCustomerCenter, presentPaywall, restorePurchases } = usePurchases()
+  const { isPremium, presentCustomerCenter, restorePurchases } = usePurchases()
   const { signOut, showAuthGate, isAnonymous, displayName, user } = useAuth()
 
-  const [awaitingSignIn, setAwaitingSignIn] = useState(false)
-  const [isRestoring,    setIsRestoring]    = useState(false)
-
-  useEffect(() => {
-    if (awaitingSignIn && !isAnonymous) {
-      setAwaitingSignIn(false)
-      if (!isPremium) {
-        presentPaywall()
-      }
-    }
-  }, [awaitingSignIn, isAnonymous, isPremium, presentPaywall])
+  const [isRestoring, setIsRestoring] = useState(false)
 
   const version = Constants.expoConfig?.version ?? 'unknown'
 
@@ -204,7 +194,7 @@ export default function MoreScreen({ navigation }: MoreScreenProps) {
                   icon={AlertTriangle}
                   label="Sign in or create account"
                   meta="Your reading isn't backed up"
-                  onPress={() => { setAwaitingSignIn(true); showAuthGate() }}
+                  onPress={() => showAuthGate()}
                   showChevron
                 />
                 <View style={styles.divider} />
