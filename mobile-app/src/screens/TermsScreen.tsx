@@ -17,7 +17,7 @@ const SECTIONS = [
   },
   {
     title: 'Payments & Refunds',
-    body: 'All purchases are one-time payments. We offer a 30-day refund policy. To request a refund, contact support@omenora.com within 30 days of purchase with your order details.',
+    body: 'OMENORA offers an auto-renewing Premium subscription, one-time purchases (such as the annual Calendar reading and individual Compatibility readings), and consumable conversation packs for Counsel. All purchases are billed through the app store you used to download the app (Apple App Store or Google Play). Premium subscriptions renew automatically at the end of each billing period unless you cancel at least 24 hours before the period ends; you can view, manage, or cancel a subscription at any time in your app store account settings. Refunds are handled by the app store, not by OMENORA directly: Apple users can request a refund at reportaproblem.apple.com, and Google Play users can request one through their Play Store order history.',
   },
   {
     title: 'Intellectual Property',

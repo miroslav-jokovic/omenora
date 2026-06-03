@@ -22,7 +22,7 @@ const SECTIONS = [
   },
   {
     title: 'Payment Information',
-    body: 'All payments are processed by Stripe. We never store your credit card details. Stripe\'s privacy policy governs how payment data is handled.',
+    body: 'Purchases made within the app are processed securely by the app store you downloaded OMENORA from (the Apple App Store or Google Play). We never receive or store your payment card details — your payment information is handled entirely by Apple or Google under their respective privacy and payment terms.',
   },
   {
     title: 'Your Rights',
