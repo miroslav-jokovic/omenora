@@ -119,14 +119,16 @@ export default function PremiumTeaserScreen() {
 
             <View style={styles.benefitsZone}>
               <EditorialBenefit>
-                The full portrait of who you were born to be.
+                You've seen your Big Three. The rest of your chart is still sealed.
               </EditorialBenefit>
               <EditorialBenefit>
-                Every planet's whisper at the moment you arrived.
+                Inside: your full archetype portrait, every planet in your natal chart,
+                your 90-day forecast, daily guidance written for your chart — and Counsel,
+                your AI astrologer, on call.
               </EditorialBenefit>
-              <EditorialBenefit>
-                The next ninety days, mapped by what's moving above.
-              </EditorialBenefit>
+              <Text variant="caption" color="secondary" style={styles.trustLine}>
+                Every word calculated from your exact birth moment — not a sun-sign guess.
+              </Text>
             </View>
           </MotiView>
         </ScrollView>
@@ -212,6 +214,10 @@ const styles = StyleSheet.create({
   benefitsZone: {
     gap:               space['6'],
     paddingHorizontal: space['4'],
+  },
+  trustLine: {
+    paddingHorizontal: space['4'],
+    textAlign:         'center',
   },
   footer: {
     gap: space['3'],
