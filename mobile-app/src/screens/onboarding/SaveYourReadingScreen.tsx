@@ -117,13 +117,18 @@ export default function SaveYourReadingScreen() {
 
   const hasNavigatedRef = useRef(false)
 
+  const goToOptionalQuestions = useCallback(() => {
+    if (hasNavigatedRef.current) return
+    hasNavigatedRef.current = true
+    navigation.replace('OptionalQuestions')
+  }, [navigation])
+
   // Navigate to OptionalQuestions when auth succeeds (anonymous → permanent)
   useEffect(() => {
-    if (!isAnonymous && !hasNavigatedRef.current) {
-      hasNavigatedRef.current = true
-      navigation.navigate('OptionalQuestions')
+    if (!isAnonymous) {
+      goToOptionalQuestions()
     }
-  }, [isAnonymous, navigation])
+  }, [isAnonymous, goToOptionalQuestions])
 
   // Countdown timer for resend cooldown
   useEffect(() => {
@@ -198,8 +203,8 @@ export default function SaveYourReadingScreen() {
   const handleDecline = useCallback(() => {
     setSaveDeclineCount(saveDeclineCount + 1)
     setSaveLastDeclinedAt(Date.now())
-    navigation.navigate('OptionalQuestions')
-  }, [saveDeclineCount, setSaveDeclineCount, setSaveLastDeclinedAt, navigation])
+    goToOptionalQuestions()
+  }, [saveDeclineCount, setSaveDeclineCount, setSaveLastDeclinedAt, goToOptionalQuestions])
 
   const greeting = firstName ? firstName : archetype ?? null
 

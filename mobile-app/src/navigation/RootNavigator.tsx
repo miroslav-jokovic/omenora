@@ -54,7 +54,7 @@ export const RootNavigator: React.FC = () => {
       <Stack.Screen name="Calculating"       component={CalculatingScreen}       options={{ animation: 'fade', gestureEnabled: false }} />
       <Stack.Screen name="BigThreeReveal"     component={BigThreeRevealScreen}     options={{ animation: 'fade', gestureEnabled: false }} />
       <Stack.Screen name="SaveYourReading"    component={SaveYourReadingScreen}    options={{ animation: 'fade', gestureEnabled: false }} />
-      <Stack.Screen name="OptionalQuestions"  component={OptionalQuestionsScreen} />
+      <Stack.Screen name="OptionalQuestions"  component={OptionalQuestionsScreen} options={{ gestureEnabled: false }} />
       <Stack.Screen name="PremiumTeaser"      component={PremiumTeaserScreen}      options={{ gestureEnabled: false }} />
       <Stack.Screen name="MainTabs"      component={TabNavigator}        options={{ animation: 'none' }} />
       <Stack.Screen name="Calendar"      component={CalendarScreen} />

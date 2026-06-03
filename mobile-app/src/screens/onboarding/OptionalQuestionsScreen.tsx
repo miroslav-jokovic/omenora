@@ -90,13 +90,7 @@ export default function OptionalQuestionsScreen() {
 
   return (
     <OnboardingStep
-      onBack={() => {
-        if (questionIndex > 0) {
-          setQuestionIndex((n) => n - 1)
-        } else {
-          navigation.goBack()
-        }
-      }}
+      onBack={questionIndex > 0 ? () => setQuestionIndex((n) => n - 1) : undefined}
       progress={<ProgressDots total={QUESTIONS.length} current={questionIndex} />}
       heading={currentQ.question}
       footer={
