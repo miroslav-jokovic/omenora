@@ -72,7 +72,7 @@ export default function BirthCityScreen() {
               Where were you born?
             </Text>
             <Text variant="readingBody" color="secondary" style={styles.support}>
-              The place beneath the sky on that day.
+              Where you were born sets your house system and how your chart is drawn — it’s why we ask.
             </Text>
           </MotiView>
 

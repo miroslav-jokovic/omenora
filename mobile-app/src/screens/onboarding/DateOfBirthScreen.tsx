@@ -82,7 +82,7 @@ export default function DateOfBirthScreen() {
               When were you born?
             </Text>
             <Text variant="readingBody" color="secondary" style={styles.support}>
-              The exact day the sky was arranged for you.
+              Your birth date sets your Sun sign and the foundation of your chart.
             </Text>
           </MotiView>
 

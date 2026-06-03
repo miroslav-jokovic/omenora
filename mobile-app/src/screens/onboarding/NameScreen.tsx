@@ -64,7 +64,7 @@ export default function NameScreen() {
                 What shall we call you?
               </Text>
               <Text variant="readingBody" color="secondary" style={styles.support}>
-                Your reading begins with your name.
+                So your reading speaks to you directly.
               </Text>
             </MotiView>
 

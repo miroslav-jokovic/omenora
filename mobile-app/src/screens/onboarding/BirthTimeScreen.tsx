@@ -78,7 +78,7 @@ export default function BirthTimeScreen() {
               What time were you born?
             </Text>
             <Text variant="readingBody" color="secondary" style={styles.support}>
-              Optional — the more precise, the deeper the reading.
+              Optional — your exact time sets your Rising sign and house placements. Even an estimate helps.
             </Text>
           </MotiView>
 
