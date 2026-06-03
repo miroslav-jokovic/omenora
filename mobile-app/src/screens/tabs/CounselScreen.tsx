@@ -13,9 +13,11 @@ import type { CounselScreenProps } from '../../navigation/types'
 
 export default function CounselScreen({ navigation }: CounselScreenProps) {
   const { sunSign, boostUpsellDismissedAt, setBoostUpsellDismissedAt } = useProfileStore()
-  const { isPremium, presentPaywall } = usePurchases()
+  const { isPremium, presentPaywall, boostPacksOffering } = usePurchases()
   const [boostSheetVisible, setBoostSheetVisible] = useState(false)
   const [upsellPackId, setUpsellPackId] = useState<BoostPackIdentifier | null>(null)
+
+  const sparkPrice = boostPacksOffering?.availablePackages.find(p => p.identifier === 'spark')?.product.priceString ?? '$1.99'
 
   const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000
   const upsellVisible = upsellPackId !== null
@@ -92,7 +94,7 @@ export default function CounselScreen({ navigation }: CounselScreenProps) {
                   fullWidth
                 />
                 <Button
-                  label="Or pay per conversation — from $1.99"
+                  label={`Or pay per conversation — from ${sparkPrice}`}
                   onPress={() => setBoostSheetVisible(true)}
                   variant="tertiary"
                   fullWidth
