@@ -147,7 +147,7 @@ export default function WelcomeScreen() {
             transition={WELCOME_SUBHEAD_TRANSITION}
           >
             <Text variant="lede" color="secondary" style={styles.subheadline}>
-              Your birth, your hour, your hemisphere — the reading is shaped only by what is true for you.
+              From your birth moment, OMENORA reads your full chart — who you are, the patterns shaping your life, and what’s ahead. It takes a minute.
             </Text>
           </MotiView>
 
@@ -164,7 +164,7 @@ export default function WelcomeScreen() {
               <View style={styles.actions}>
                 <View testID="welcome-cta-primary">
                   <Button
-                    label="Begin"
+                    label="Reveal my chart"
                     variant="premium"
                     fullWidth
                     onPress={() => navigation.navigate('Name')}
@@ -257,7 +257,7 @@ const styles = StyleSheet.create({
     paddingBottom: space['6'],       // 24px — safe area already covers system bar
   },
   subheadline: {
-    marginBottom: space['6'],        // 24px separation before CTA
+    marginBottom: space['4'],        // 16px separation before CTA (reduced from 24px for longer text)
     textAlign:    'center',
   },
   actions: {
