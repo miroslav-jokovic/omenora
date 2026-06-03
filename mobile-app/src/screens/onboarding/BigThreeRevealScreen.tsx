@@ -90,6 +90,9 @@ export default function BigThreeRevealScreen() {
           <Text variant="display1" color="primary" style={styles.archetypeName} accessibilityRole="header">
             {archetypeName}
           </Text>
+          <Text variant="caption" color="secondary" style={styles.curiosityLine}>
+            This is the surface. Beneath it: your shadow, the seven planets you haven’t met yet, and the timing of what’s ahead.
+          </Text>
         </MotiView>
       </SafeAreaView>
 
@@ -100,7 +103,7 @@ export default function BigThreeRevealScreen() {
         style={[styles.footer, { paddingBottom: Math.max(space['8'], insets.bottom + space['4']) }]}
       >
         <Button
-          label="Continue to deeper reading"
+          label="Show me the rest"
           variant="premium"
           fullWidth
           onPress={() => navigation.replace('SaveYourReading')}
@@ -151,6 +154,11 @@ const styles = StyleSheet.create({
   },
   archetypeName: {
     textAlign: 'center',
+  },
+  curiosityLine: {
+    textAlign:  'center',
+    marginTop:  space['4'],
+    maxWidth:   300,
   },
   footer: {
     paddingHorizontal: layout.screenPadding,
