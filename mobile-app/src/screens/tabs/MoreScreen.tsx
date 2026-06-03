@@ -10,6 +10,7 @@ import {
   Compass,
   User,
   CreditCard,
+  RotateCcw,
   Bell,
   Globe,
   Shield,
@@ -47,10 +48,11 @@ const LOGO_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 301.62 49
 
 export default function MoreScreen({ navigation }: MoreScreenProps) {
   const { languageOverride } = useProfileStore()
-  const { isPremium, presentCustomerCenter, presentPaywall } = usePurchases()
+  const { isPremium, presentCustomerCenter, presentPaywall, restorePurchases } = usePurchases()
   const { signOut, showAuthGate, isAnonymous, displayName, user } = useAuth()
 
   const [awaitingSignIn, setAwaitingSignIn] = useState(false)
+  const [isRestoring,    setIsRestoring]    = useState(false)
 
   useEffect(() => {
     if (awaitingSignIn && !isAnonymous) {
@@ -62,6 +64,18 @@ export default function MoreScreen({ navigation }: MoreScreenProps) {
   }, [awaitingSignIn, isAnonymous, isPremium, presentPaywall])
 
   const version = Constants.expoConfig?.version ?? 'unknown'
+
+  const handleRestore = useCallback(async () => {
+    setIsRestoring(true)
+    try {
+      await restorePurchases()
+      Alert.alert('Purchases Restored', 'Your purchases have been checked and restored to this device.')
+    } catch (err) {
+      Alert.alert('Restore Failed', "Couldn't restore purchases. Try again or contact support@omenora.com.")
+    } finally {
+      setIsRestoring(false)
+    }
+  }, [restorePurchases])
 
   const handleSignOut = useCallback(async () => {
     if (isAnonymous) {
@@ -210,6 +224,15 @@ export default function MoreScreen({ navigation }: MoreScreenProps) {
               label="Subscription"
               onPress={presentCustomerCenter}
               showChevron
+            />
+            <View style={styles.divider} />
+            {/* Restore Purchases — visible to all users; operates on the store account */}
+            <ListItem
+              icon={RotateCcw}
+              label="Restore Purchases"
+              meta={isRestoring ? 'Restoring…' : undefined}
+              onPress={handleRestore}
+              disabled={isRestoring}
             />
             <View style={styles.divider} />
             {/* Notifications route not yet registered — Phase 6 */}
