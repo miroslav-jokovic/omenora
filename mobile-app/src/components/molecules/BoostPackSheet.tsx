@@ -92,6 +92,10 @@ export const BoostPackSheet: React.FC<BoostPackSheetProps> = ({
                 </Text>
               ) : (
                 <>
+                  <Text variant="caption" color="secondary" style={styles.sheetDescription}>
+                    Each conversation is a full back-and-forth with Counsel about your chart — ask follow-ups, go deeper, get guidance grounded in your exact placements.
+                  </Text>
+
                   {PACK_META.map((pack, idx) => {
                     const priceString    = getPriceString(pack.id, pack.fallbackPrice)
                     const isThisPurchasing = isPurchasing === pack.id
@@ -216,5 +220,8 @@ const styles = StyleSheet.create({
   errorText: {
     marginTop: space['3'],
     textAlign: 'center',
+  },
+  sheetDescription: {
+    marginBottom: space['4'],
   },
 })
