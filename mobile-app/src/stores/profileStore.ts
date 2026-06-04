@@ -84,6 +84,10 @@ export interface ProfileState {
   hasAcceptedCounselDisclosure:    boolean;
   setHasAcceptedCounselDisclosure: (accepted: boolean) => void;
 
+  // First-run orientation flags
+  hasSeenTodayIntro:    boolean;
+  setHasSeenTodayIntro: (seen: boolean) => void;
+
   // Actions
   setFirstName: (name: string) => void;
   setDateOfBirth: (date: string) => void;
@@ -138,6 +142,7 @@ const initialState = {
   natalChartReading: null,
   forecastReading:   null,
   hasAcceptedCounselDisclosure: false,
+  hasSeenTodayIntro: false,
   analyticsEnabled: true,
   pendingServerSync: false,
   saveDeclineCount: 0,
@@ -179,6 +184,7 @@ export const useProfileStore = create<ProfileState>()(
       setNatalChartReading: (natalChartReading) => set({ natalChartReading }),
       setForecastReading:   (forecastReading)   => set({ forecastReading }),
       setHasAcceptedCounselDisclosure: (hasAcceptedCounselDisclosure) => set({ hasAcceptedCounselDisclosure }),
+      setHasSeenTodayIntro: (hasSeenTodayIntro) => set({ hasSeenTodayIntro }),
       setSaveDeclineCount: (saveDeclineCount) => set({ saveDeclineCount }),
       setSaveLastDeclinedAt: (saveLastDeclinedAt) => set({ saveLastDeclinedAt }),
       setBoostUpsellDismissedAt: (boostUpsellDismissedAt) => set({ boostUpsellDismissedAt }),
@@ -272,6 +278,7 @@ export const useProfileStore = create<ProfileState>()(
         natalChartReading: state.natalChartReading,
         forecastReading:   state.forecastReading,
         hasAcceptedCounselDisclosure: state.hasAcceptedCounselDisclosure,
+        hasSeenTodayIntro: state.hasSeenTodayIntro,
         analyticsEnabled: state.analyticsEnabled,
         answers: state.answers,
         pendingServerSync: state.pendingServerSync,

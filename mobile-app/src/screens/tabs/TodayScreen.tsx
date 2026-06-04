@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import {
   View,
+  Pressable,
   ScrollView,
   RefreshControl,
   ActivityIndicator,
   StyleSheet,
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { MessageCircle, BookOpen } from 'lucide-react-native'
+import { MessageCircle, BookOpen, X } from 'lucide-react-native'
 import { Text, DimensionIcon } from '../../components/atoms'
 import { Card, LockedCard } from '../../components/organisms'
 import MoonPhaseHero from '../../components/hero/MoonPhaseHero'
@@ -23,7 +24,7 @@ import { tokens, space, layout } from '../../design/tokens'
 import type { TodayScreenProps } from '../../navigation/types'
 
 export default function TodayScreen({ navigation }: TodayScreenProps) {
-  const { firstName, archetype, sunSign, languageOverride } = useProfileStore()
+  const { firstName, archetype, sunSign, languageOverride, hasSeenTodayIntro, setHasSeenTodayIntro } = useProfileStore()
   const { displayName } = useAuth()
   const { isPremium, presentPaywall } = usePurchases()
 
@@ -32,6 +33,8 @@ export default function TodayScreen({ navigation }: TodayScreenProps) {
   const [error, setError]         = useState<string | null>(null)
   const [refreshing, setRefreshing] = useState(false)
   const abortRef = useRef<AbortController | null>(null)
+
+  const [storeHydrated, setStoreHydrated] = useState(false)
 
   const today = useMemo(() => new Date(), [])
 
@@ -86,6 +89,15 @@ export default function TodayScreen({ navigation }: TodayScreenProps) {
     fetchDailyCache()
     return () => { abortRef.current?.abort() }
   }, [fetchDailyCache])
+
+  useEffect(() => {
+    if (useProfileStore.persist.hasHydrated()) {
+      setStoreHydrated(true)
+      return
+    }
+    const unsub = useProfileStore.persist.onFinishHydration(() => setStoreHydrated(true))
+    return unsub
+  }, [])
 
   // ── Content selection ──────────────────────────────────────────────────────
   const archetypeContent = useMemo(() => {
@@ -255,6 +267,28 @@ export default function TodayScreen({ navigation }: TodayScreenProps) {
           </Card>
         )}
 
+        {/* ── 6b. First-run orientation card — show once for free users ─── */}
+        {storeHydrated && !isPremium && !hasSeenTodayIntro && (
+          <Card variant="glass" padding="default">
+            <View style={styles.introHeader}>
+              <Text variant="eyebrow" color="secondary">
+                Welcome in{firstName ? `, ${firstName}` : ''}
+              </Text>
+              <Pressable
+                onPress={() => setHasSeenTodayIntro(true)}
+                hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+                accessibilityLabel="Dismiss"
+                accessibilityRole="button"
+              >
+                <X size={18} color={tokens.text.tertiary} />
+              </Pressable>
+            </View>
+            <Text variant="caption" color="secondary" style={styles.introBody}>
+              {'Your daily reading above is yours, free, every day. Your full chart — shadow, planets, timing, and guidance for love, work, and health — unlocks with Premium. Tap any locked card below to see what’s inside.'}
+            </Text>
+          </Card>
+        )}
+
         {/* ── 7. Deeper insight — LockedCard for free users ─── */}
         {!isPremium && (
           <LockedCard
@@ -316,5 +350,13 @@ const styles = StyleSheet.create({
   },
   reflectionText: {
     fontStyle: 'italic',
+  },
+  introHeader: {
+    flexDirection:  'row',
+    justifyContent: 'space-between',
+    alignItems:     'center',
+  },
+  introBody: {
+    marginTop: space['3'],
   },
 })
