@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback, useRef } from 'react'
 import { Alert } from 'react-native'
 import * as AppleAuthentication from 'expo-apple-authentication'
 import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin'
+import * as Sentry from '@sentry/react-native'
 import type { Session } from '@supabase/supabase-js'
 import Purchases from 'react-native-purchases'
 import { supabase } from '../lib/supabase'
@@ -257,6 +258,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           saveProfile(signInData.user.id, { first_name: appleGivenName }).catch((e) =>
             console.warn('[Auth] Apple name save to server failed (non-blocking):', e)
           )
+        }
+      }
+
+      // Best-effort: exchange authorizationCode for an Apple refresh_token stored
+      // server-side. Required for token revocation on account deletion (guideline
+      // 5.1.1(v)). Must not block or affect the sign-in UX in any way.
+      if (credential.authorizationCode) {
+        const apiBaseUrl = process.env.EXPO_PUBLIC_API_BASE_URL
+        const accessToken = signInData?.session?.access_token
+        if (apiBaseUrl && accessToken) {
+          const code = credential.authorizationCode
+          fetch(`${apiBaseUrl}/api/auth/apple-link`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${accessToken}`,
+            },
+            body: JSON.stringify({ authorizationCode: code }),
+          }).catch((linkErr: unknown) => {
+            Sentry.captureException(linkErr, {
+              tags: { flow: 'apple_link' },
+              extra: { userId: signInData?.user?.id },
+            })
+          })
         }
       }
     } catch (err: any) {

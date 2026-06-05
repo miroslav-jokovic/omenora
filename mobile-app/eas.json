@@ -50,14 +50,14 @@
   "submit": {
     "production": {
       "android": {
-        "serviceAccountKeyPath": "path-to-service-account-key.json",
+        "serviceAccountKeyPath": "TODO: founder to fill — local file path to Google Play service-account JSON",
         "track": "production"
       },
       "ios": {
-        "ascAppId": "[YOUR_APPLE_APP_ID]",
-        "ascApiKeyPath": "path-to-asc-api-key.p8",
-        "ascApiKeyIssuerId": "[YOUR_ISSUER_ID]",
-        "ascApiKeyId": "[YOUR_KEY_ID]"
+        "ascAppId": "6768273672",
+        "ascApiKeyPath": "TODO: founder to fill — local file path to .p8 App Store Connect API key",
+        "ascApiKeyIssuerId": "1ef6da1b-f4f2-49d7-b99e-00fff110c7ed",
+        "ascApiKeyId": "2WH7BK98S8"
       }
     }
   }
