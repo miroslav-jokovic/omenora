@@ -64,6 +64,10 @@ export default defineNuxtConfig({
     revenuecatWebhookSecret: '',
     redisUrl: '',
     adminSecret: '',
+    appleSiwaTeamId: '',
+    appleSiwaKeyId: '',
+    appleSiwaPrivateKey: '',
+    appleSiwaClientId: '',
     public: {
       stripePublishableKey: '',
       supabaseUrl: '',
