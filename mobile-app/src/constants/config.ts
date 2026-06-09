@@ -11,13 +11,10 @@ export const API_BASE_URL =
 export const APP_NAME = 'OMENORA';
 export const APP_VERSION = '1.0.0';
 export const APP_STORE_URL = 'https://apps.apple.com/app/omenora';
-export const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.omenora.app';
 
 // Feature Flags
 export const FEATURES = {
   APPLE_SIGN_IN: true,
-  GOOGLE_PAY: true,
-  APPLE_PAY: true,
   PUSH_NOTIFICATIONS: true,
   DARK_MODE_ONLY: true,
 } as const;

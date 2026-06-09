@@ -324,16 +324,6 @@ export const api = {
     return response.data;
   },
 
-  getReport: async (reportId: string): Promise<GenerateReportResponse> => {
-    const response = await apiClient.post('/api/get-report', { reportId });
-    return response.data;
-  },
-
-  checkReportExists: async (firstName: string, dateOfBirth: string): Promise<{ exists: boolean; reportId?: string }> => {
-    const response = await apiClient.post('/api/check-report-exists', { firstName, dateOfBirth });
-    return response.data;
-  },
-
   // Birth Chart
   generateBirthChart: async (data: GenerateBirthChartRequest): Promise<GenerateBirthChartResponse> => {
     const response = await apiClient.post<GenerateBirthChartResponse>('/api/generate-birth-chart', data);
@@ -354,12 +344,6 @@ export const api = {
 
   getCalendar: async (sessionId: string) => {
     const response = await apiClient.post('/api/get-calendar', { sessionId });
-    return response.data;
-  },
-
-  // Daily Insights
-  generateDailyInsight: async (data: DailyInsightRequest) => {
-    const response = await apiClient.post('/api/generate-daily-insight', data);
     return response.data;
   },
 
