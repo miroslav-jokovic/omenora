@@ -16,6 +16,7 @@ import { PurchasesContext } from './PurchasesContext'
 import { CustomPaywall } from '../components/organisms/CustomPaywall'
 import { deriveEntitlements } from '../lib/entitlements'
 import { track } from '../lib/analytics'
+import { Toast } from '../components/molecules'
 
 interface Props {
   children: React.ReactNode
@@ -44,6 +45,7 @@ export function PurchasesProvider({ children }: Props) {
   const [calendarProduct,            setCalendarProduct]            = useState<PurchasesStoreProduct | null>(null)
   const [paywallVisible, setPaywallVisible] = useState(false)
   const [paywallSource, setPaywallSource] = useState<string | undefined>(undefined)
+  const [premiumToastVisible, setPremiumToastVisible] = useState(false)
   const paywallResolver = useRef<((result: PAYWALL_RESULT) => void) | null>(null)
 
   // Initialize SDK once
@@ -183,6 +185,7 @@ export function PurchasesProvider({ children }: Props) {
 
   const handlePaywallPurchased = useCallback(() => {
     setPaywallVisible(false)
+    setPremiumToastVisible(true)
     paywallResolver.current?.(PAYWALL_RESULT.PURCHASED)
     paywallResolver.current = null
   }, [])
@@ -289,6 +292,12 @@ export function PurchasesProvider({ children }: Props) {
         source={paywallSource}
         onClose={handlePaywallClose}
         onPurchased={handlePaywallPurchased}
+      />
+      <Toast
+        variant="success"
+        message="Welcome to Premium"
+        visible={premiumToastVisible}
+        onDismiss={() => setPremiumToastVisible(false)}
       />
     </PurchasesContext.Provider>
   )
