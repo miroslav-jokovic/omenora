@@ -12,6 +12,7 @@ import { useProfileStore } from '../../stores/profileStore'
 import { calculateLifePathNumber } from '../../utils/lifePathNumber'
 import { surface, text, space, layout } from '../../design/tokens'
 import { RootStackParamList } from '../../navigation/types'
+import { track } from '../../lib/analytics'
 
 type DateOfBirthNavProp = NativeStackNavigationProp<RootStackParamList, 'DateOfBirth'>
 
@@ -52,6 +53,7 @@ export default function DateOfBirthScreen() {
   const handleContinue = () => {
     const lpn = calculateLifePathNumber(dateOfBirth)
     setLifePathNumber(lpn)
+    track('onboarding_step_completed', { step: 'dob' })
     navigation.navigate('BirthCity')
   }
 

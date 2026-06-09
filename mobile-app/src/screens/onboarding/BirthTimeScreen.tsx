@@ -11,6 +11,7 @@ import { AtmosphericBackground } from '../../components/atmosphere'
 import { useProfileStore } from '../../stores/profileStore'
 import { surface, text, space, layout } from '../../design/tokens'
 import { RootStackParamList } from '../../navigation/types'
+import { track } from '../../lib/analytics'
 
 type BirthTimeNavProp = NativeStackNavigationProp<RootStackParamList, 'BirthTime'>
 
@@ -107,7 +108,7 @@ export default function BirthTimeScreen() {
             label="Continue"
             variant="premium"
             fullWidth
-            onPress={() => navigation.navigate('Calculating')}
+            onPress={() => { track('onboarding_step_completed', { step: 'time' }); navigation.navigate('Calculating') }}
           />
         </MotiView>
       </SafeAreaView>

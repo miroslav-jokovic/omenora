@@ -11,6 +11,7 @@ import { AtmosphericBackground } from '../../components/atmosphere'
 import { useProfileStore } from '../../stores/profileStore'
 import { surface, text, space, layout } from '../../design/tokens'
 import { RootStackParamList } from '../../navigation/types'
+import { track } from '../../lib/analytics'
 
 type NameNavProp = NativeStackNavigationProp<RootStackParamList, 'Name'>
 
@@ -96,7 +97,7 @@ export default function NameScreen() {
               variant="premium"
               fullWidth
               disabled={!canContinue}
-              onPress={() => navigation.navigate('DateOfBirth')}
+              onPress={() => { track('onboarding_step_completed', { step: 'name' }); navigation.navigate('DateOfBirth') }}
             />
           </MotiView>
         </SafeAreaView>

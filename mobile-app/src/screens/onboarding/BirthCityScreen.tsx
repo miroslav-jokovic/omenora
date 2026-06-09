@@ -12,6 +12,7 @@ import { useProfileStore } from '../../stores/profileStore'
 import { surface, text, space, layout } from '../../design/tokens'
 import { RootStackParamList } from '../../navigation/types'
 import type { Place } from '../../api/nominatim'
+import { track } from '../../lib/analytics'
 
 type BirthCityNavProp = NativeStackNavigationProp<RootStackParamList, 'BirthCity'>
 
@@ -102,7 +103,7 @@ export default function BirthCityScreen() {
             variant="premium"
             fullWidth
             disabled={!canContinue}
-            onPress={() => navigation.navigate('BirthTime')}
+            onPress={() => { track('onboarding_step_completed', { step: 'city' }); navigation.navigate('BirthTime') }}
           />
         </MotiView>
       </SafeAreaView>

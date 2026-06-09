@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { View, StyleSheet } from 'react-native'
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native'
@@ -9,6 +9,7 @@ import { Card } from '../../components/organisms'
 import { AtmosphericBackground } from '../../components/atmosphere'
 import { tokens, space, layout } from '../../design/tokens'
 import { RootStackParamList } from '../../navigation/types'
+import { track } from '../../lib/analytics'
 
 type BigThreeRevealNavProp   = NativeStackNavigationProp<RootStackParamList, 'BigThreeReveal'>
 type BigThreeRevealRouteProp = RouteProp<RootStackParamList, 'BigThreeReveal'>
@@ -37,6 +38,8 @@ export default function BigThreeRevealScreen() {
   const route      = useRoute<BigThreeRevealRouteProp>()
   const { sunSign, moonSign, risingSign, archetypeName } = route.params
   const insets = useSafeAreaInsets()
+
+  useEffect(() => { track('reveal_viewed') }, [])
 
   const cards = PLACEMENTS(sunSign, moonSign, risingSign)
 

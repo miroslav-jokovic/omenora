@@ -27,6 +27,7 @@ import { Button } from '../../components/atoms/Button'
 import { useAuth } from '../../context/useAuth'
 import { useProfileComplete } from '../../stores/profileStore'
 import { RootStackParamList } from '../../navigation/types'
+import { track } from '../../lib/analytics'
 
 type WelcomeNavProp = NativeStackNavigationProp<RootStackParamList, 'Welcome'>
 
@@ -63,6 +64,8 @@ export default function WelcomeScreen() {
   const { isAnonymous, profileHydrating, profileHydrated, showAuthGate } = useAuth()
   const profileComplete = useProfileComplete()
   const [hydrationTimedOut, setHydrationTimedOut] = useState(false)
+
+  useEffect(() => { track('welcome_viewed') }, [])
 
   // Route after sign-in based on profile completeness. Wait for hydration
   // to COMPLETE (profileHydrated=true) before evaluating the triple-check —

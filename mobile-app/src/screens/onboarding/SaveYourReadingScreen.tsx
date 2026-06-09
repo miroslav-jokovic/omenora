@@ -19,6 +19,7 @@ import { useAuth } from '../../context/useAuth'
 import { useProfileStore } from '../../stores/profileStore'
 import { space, layout, tokens, typeScale, fontFamily } from '../../design/tokens'
 import { RootStackParamList } from '../../navigation/types'
+import { track } from '../../lib/analytics'
 
 type SaveYourReadingNavProp = NativeStackNavigationProp<RootStackParamList, 'SaveYourReading'>
 
@@ -201,6 +202,7 @@ export default function SaveYourReadingScreen() {
   }, [resendCooldown, resendCount, email, sendEmailOtp])
 
   const handleDecline = useCallback(() => {
+    track('save_reading_declined')
     setSaveDeclineCount(saveDeclineCount + 1)
     setSaveLastDeclinedAt(Date.now())
     goToOptionalQuestions()
