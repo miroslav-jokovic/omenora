@@ -6,7 +6,6 @@ import {
   PressableStateCallbackType,
   ActivityIndicator,
 } from 'react-native'
-import { SvgXml } from 'react-native-svg'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { useNavigation } from '@react-navigation/native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
@@ -23,6 +22,7 @@ import {
 } from '../../design/tokens'
 import { AtmosphericBackground } from '../../components/atmosphere'
 import { Text } from '../../components/atoms/Text'
+import { Logomark } from '../../components/atoms/Logomark'
 import { Button } from '../../components/atoms/Button'
 import { useAuth } from '../../context/useAuth'
 import { useProfileComplete } from '../../stores/profileStore'
@@ -30,18 +30,6 @@ import { RootStackParamList } from '../../navigation/types'
 import { track } from '../../lib/analytics'
 
 type WelcomeNavProp = NativeStackNavigationProp<RootStackParamList, 'Welcome'>
-
-// Omenora logomark SVG — all fills overridden to text.primary (#F2EDE5 warm cream).
-// Renders as a clean monochrome mark with no background square.
-const LOGO_FILL = '#F2EDE5'
-const LOGO_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 301.62 499.33">
-  <polygon fill="${LOGO_FILL}" points="301.62 210.03 234.96 187.05 174.86 114.93 150.08 0 301.62 210.03"/>
-  <polygon fill="${LOGO_FILL}" points="150.08 499.33 0 214 79.78 195.77 150.08 499.33"/>
-  <path fill="${LOGO_FILL}" d="M301.62,210.03l-151.54,289.29c3.2-86.22,39.95-196.34,84.88-312.28l66.66,22.98Z" opacity="0.75"/>
-  <polygon fill="${LOGO_FILL}" points="150.08 0 79.78 195.77 0 214 150.08 0" opacity="0.55"/>
-  <polygon fill="${LOGO_FILL}" points="174.86 114.93 79.78 195.77 150.08 0 174.86 114.93" opacity="0.88"/>
-  <path fill="${LOGO_FILL}" d="M234.96,187.05c-44.93,115.94-81.68,226.06-84.88,312.28L79.78,195.77l95.08-80.84,60.11,72.12Z" opacity="0.65"/>
-</svg>`
 
 const WELCOME_WORDMARK_FROM       = { opacity: 0 } as const
 const WELCOME_WORDMARK_ANIMATE    = { opacity: 1 } as const
@@ -111,12 +99,7 @@ export default function WelcomeScreen() {
           transition={WELCOME_WORDMARK_TRANSITION}
           style={styles.topBar}
         >
-          <SvgXml
-            xml={LOGO_SVG}
-            width={styles.logoMark.width}
-            height={styles.logoMark.height}
-            accessibilityLabel="Omenora"
-          />
+          <Logomark size={60} />
         </MotiView>
 
         {/* Headline cluster — upper third, asymmetric with right breathing room */}
@@ -230,10 +213,6 @@ const styles = StyleSheet.create({
   topBar: {
     paddingTop:  space['5'],        // 20px — tighter masthead, more room for content
     alignItems:  'center',
-  },
-  logoMark: {
-    width:  60,
-    height: 60,
   },
   headlineZone: {
     flex:              1,

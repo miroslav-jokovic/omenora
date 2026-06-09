@@ -1,6 +1,5 @@
 import React, { useCallback, useState } from 'react'
 import { View, ScrollView, Alert, Linking, StyleSheet } from 'react-native'
-import { SvgXml } from 'react-native-svg'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { CommonActions } from '@react-navigation/native'
 import Constants from 'expo-constants'
@@ -25,7 +24,7 @@ import {
   Layers,
   Lock,
 } from 'lucide-react-native'
-import { Text } from '../../components/atoms'
+import { Text, Logomark } from '../../components/atoms'
 import { Card } from '../../components/organisms'
 import { ListItem } from '../../components/molecules'
 import { useProfileStore } from '../../stores/profileStore'
@@ -34,17 +33,6 @@ import { useAuth } from '../../context/useAuth'
 import { tokens, space, layout } from '../../design/tokens'
 import { AtmosphericBackground } from '../../components/atmosphere'
 import type { MoreScreenProps } from '../../navigation/types'
-
-// Omenora logomark — same inline SVG used by WelcomeScreen
-const LOGO_FILL = '#F2EDE5'
-const LOGO_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 301.62 499.33">
-  <polygon fill="${LOGO_FILL}" points="301.62 210.03 234.96 187.05 174.86 114.93 150.08 0 301.62 210.03"/>
-  <polygon fill="${LOGO_FILL}" points="150.08 499.33 0 214 79.78 195.77 150.08 499.33"/>
-  <path fill="${LOGO_FILL}" d="M301.62,210.03l-151.54,289.29c3.2-86.22,39.95-196.34,84.88-312.28l66.66,22.98Z" opacity="0.75"/>
-  <polygon fill="${LOGO_FILL}" points="150.08 0 79.78 195.77 0 214 150.08 0" opacity="0.55"/>
-  <polygon fill="${LOGO_FILL}" points="174.86 114.93 79.78 195.77 150.08 0 174.86 114.93" opacity="0.88"/>
-  <path fill="${LOGO_FILL}" d="M234.96,187.05c-44.93,115.94-81.68,226.06-84.88,312.28L79.78,195.77l95.08-80.84,60.11,72.12Z" opacity="0.65"/>
-</svg>`
 
 export default function MoreScreen({ navigation }: MoreScreenProps) {
   const { languageOverride } = useProfileStore()
@@ -122,12 +110,7 @@ export default function MoreScreen({ navigation }: MoreScreenProps) {
       >
         {/* ── Brand logo mark ────────────────────────────────────────── */}
         <View style={styles.logoBlock}>
-          <SvgXml
-            xml={LOGO_SVG}
-            width={styles.logoMark.width}
-            height={styles.logoMark.height}
-            accessibilityLabel="Omenora"
-          />
+          <Logomark size={40} />
         </View>
 
         {/* ── Account header ─────────────────────────────────────────── */}
@@ -393,10 +376,6 @@ const styles = StyleSheet.create({
   logoBlock: {
     alignItems:   'center',
     paddingBottom: space['6'],
-  },
-  logoMark: {
-    width:   40,
-    height:  40,
   },
   sectionHeading: {
     marginBottom: space['2'],

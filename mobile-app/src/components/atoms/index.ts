@@ -34,3 +34,6 @@ export { DimensionIcon } from './DimensionIcon'
 export type { DimensionIconProps } from './DimensionIcon'
 
 export { OmenLoader } from './OmenLoader'
+
+export { Logomark } from './Logomark'
+export type { LogomarkProps } from './Logomark'
