@@ -1,6 +1,6 @@
 # OMENORA Monetization Spec v4 (LOCKED)
 
-**Last updated:** 2026-05-15  
+**Last updated:** 2026-06-09 (reconciled to shipped build: 3 tiers, no trial)  
 **Status:** Locked. Source of truth for all RevenueCat product creation, backend gating logic, and pricing UI.
 
 ---
@@ -9,10 +9,13 @@
 
 | Product ID | Price | Billing |
 |---|---|---|
+| `omenora_weekly` | $6.99 | Weekly |
 | `omenora_monthly` | $14.99 | Monthly |
 | `omenora_annual` | $99.99 | Annual |
 
-**Trial:** 7-day free trial on both plans.
+**Trial:** None — hard paywall on all plans (no intro/free trial), per
+MASTER_PLAN_LAUNCH and STRATEGY. Prices reflect App Store Connect / RevenueCat
+configuration; the mobile paywall reads live prices with these as fallbacks.
 
 ### Included in Premium
 
@@ -95,6 +98,7 @@
 
 | Product ID | Type | Entitlement Key Granted | Credit Grant Mechanism |
 |---|---|---|---|
+| `omenora_weekly` | Auto-renewable subscription | `premium` | Entitlement-based (active while subscribed) |
 | `omenora_monthly` | Auto-renewable subscription | `premium` | Entitlement-based (active while subscribed) |
 | `omenora_annual` | Auto-renewable subscription | `premium` | Entitlement-based (active while subscribed) |
 | `omenora_calendar_2026` | Non-consumable IAP | `calendar_2026` | Entitlement-based (permanent unlock) |

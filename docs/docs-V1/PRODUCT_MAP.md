@@ -156,7 +156,10 @@ Backend-enforced caps on Premium subscription scope. These exist to protect unit
 
 ### Critical correction pending
 
-The Counsel cap is currently enforced as **30/day** in `entitlements.ts` and `feature_usage` semantics. The locked spec requires **30/month**. At 30/day with realistic usage, a heavy user costs OMENORA up to $153/mo in API while paying $10.49 net after Apple's cut. **The backend cap must be changed to 30/month before any Counsel monetization ships.**
+The Counsel cap is enforced as **30/month** in `augur/server/utils/entitlements.ts` 
+(`counsel: { cap: 30, period: 'monthly' }`, verified 2026-06-09) — matching the locked
+spec. No fix is outstanding. (Earlier drafts of this doc described a 30/day bug; that is
+resolved.)
 
 ---
 
@@ -189,7 +192,7 @@ All items listed below conflict with locked strategy (STRATEGY.md section 8). Th
 |---|---|---|
 | `$6.99/mo` subscription display | `app/pages/daily.vue:344`, `app/pages/report.vue:515` | Off-strategy. Locked price is $14.99/mo. |
 | `$6.99` subscription pixel-track | `app/pages/subscription.vue:114` | Same issue. |
-| `$12.99` "Also included in Full Oracle" label | `mobile-app/src/screens/CalendarScreen.tsx:75`, `mobile-app/src/screens/CompatibilityScreen.tsx:88` | Orphaned label. No product at this price exists anywhere. Full Oracle is deprecated. |
+| `$12.99` "Also included in Full Oracle" label | (removed) | RESOLVED 2026-06-09 — the orphaned label no longer exists in `mobile-app/src` (grep for "12.99" / "Full Oracle" returns nothing). |
 
 ---
 
