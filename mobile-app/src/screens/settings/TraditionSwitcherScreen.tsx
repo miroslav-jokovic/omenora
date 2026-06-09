@@ -76,7 +76,7 @@ export default function TraditionSwitcherScreen({ navigation }: TraditionSwitche
 
   const handleUnlockPress = useCallback(async () => {
     try {
-      await presentPaywall()
+      await presentPaywall('tradition_switcher')
     } catch (err) {
       console.warn('[TraditionSwitcher] presentPaywall threw:', err)
     }

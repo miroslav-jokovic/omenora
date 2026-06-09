@@ -22,6 +22,7 @@ import api from '../../api/endpoints'
 import type { GetDailyCacheResponse } from '../../api/endpoints'
 import { tokens, space, layout } from '../../design/tokens'
 import type { TodayScreenProps } from '../../navigation/types'
+import { track } from '../../lib/analytics'
 
 export default function TodayScreen({ navigation }: TodayScreenProps) {
   const { firstName, archetype, sunSign, languageOverride, hasSeenTodayIntro, setHasSeenTodayIntro } = useProfileStore()
@@ -35,6 +36,8 @@ export default function TodayScreen({ navigation }: TodayScreenProps) {
   const abortRef = useRef<AbortController | null>(null)
 
   const [storeHydrated, setStoreHydrated] = useState(false)
+
+  useEffect(() => { track('today_opened') }, [])
 
   const today = useMemo(() => new Date(), [])
 
@@ -295,7 +298,7 @@ export default function TodayScreen({ navigation }: TodayScreenProps) {
             placement="feature_archetype_today"
             title="Your Full Daily Reading"
             description="Today's full reading: the cosmic stage you're moving through, a reflection written for your archetype, and the planetary weather shaping your day."
-            onUnlockPress={async () => { await presentPaywall() }}
+            onUnlockPress={async () => { await presentPaywall('today_full_reading') }}
           />
         )}
 
@@ -305,7 +308,7 @@ export default function TodayScreen({ navigation }: TodayScreenProps) {
             placement="feature_dimensions_today"
             title="Today's Life Dimensions"
             description="How today lands for your Love, Work, and Health — guidance for each, read from your chart and today's transits."
-            onUnlockPress={async () => { await presentPaywall() }}
+            onUnlockPress={async () => { await presentPaywall('today_dimensions') }}
           />
         )}
       </ScrollView>

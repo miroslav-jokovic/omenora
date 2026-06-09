@@ -11,6 +11,7 @@ import { useAuth } from '../../context/useAuth'
 import { usePurchases } from '../../context/usePurchases'
 import { tokens, space, layout } from '../../design/tokens'
 import { RootStackParamList } from '../../navigation/types'
+import { track } from '../../lib/analytics'
 
 type PremiumTeaserNavProp = NativeStackNavigationProp<RootStackParamList, 'PremiumTeaser'>
 
@@ -50,8 +51,10 @@ export default function PremiumTeaserScreen() {
 
   const [awaitingAuth, setAwaitingAuth] = useState(false)
 
+  useEffect(() => { track('premium_teaser_viewed') }, [])
+
   const proceedToPaywall = useCallback(() => {
-    presentPaywall().finally(() => navigation.replace('MainTabs'))
+    presentPaywall('onboarding_premium_teaser').finally(() => navigation.replace('MainTabs'))
   }, [presentPaywall, navigation])
 
   useEffect(() => {

@@ -1,9 +1,11 @@
 import React, { useState } from 'react'
 import { Modal, Pressable, StyleSheet, View } from 'react-native'
+import * as Sentry from '@sentry/react-native'
 import Animated, { FadeInDown } from 'react-native-reanimated'
 import { Text, Button } from '../atoms'
 import { Card } from '../organisms'
 import { usePurchases } from '../../context/usePurchases'
+import { track } from '../../lib/analytics'
 import { tokens, space, layout, radius, duration as motionDuration } from '../../design/tokens'
 
 export interface CalendarIAPSheetProps {
@@ -29,11 +31,13 @@ export const CalendarIAPSheet: React.FC<CalendarIAPSheetProps> = ({
     setErrorMessage(null)
     try {
       await purchaseCalendar()
+      track('iap_purchased', { product: 'calendar_2026' })
       onPurchaseSuccess()
       onDismiss()
     } catch (err) {
       const e = err as { userCancelled?: boolean; message?: string }
       if (!e.userCancelled) {
+        Sentry.captureException(err, { tags: { flow: 'purchase_calendar' } })
         setErrorMessage(e.message ?? "Couldn't complete the purchase. Try again or contact support@omenora.com.")
       }
     } finally {
@@ -49,6 +53,7 @@ export const CalendarIAPSheet: React.FC<CalendarIAPSheetProps> = ({
       onDismiss()
     } catch (err) {
       const e = err as { message?: string }
+      Sentry.captureException(err, { tags: { flow: 'restore_purchases' } })
       setErrorMessage(e.message ?? "Couldn't restore purchases. Try again or contact support@omenora.com.")
     } finally {
       setIsRestoring(false)
@@ -58,7 +63,7 @@ export const CalendarIAPSheet: React.FC<CalendarIAPSheetProps> = ({
   const handleSeePremium = async () => {
     onDismiss()
     try {
-      await presentPaywall()
+      await presentPaywall('calendar_sheet_upsell')
     } catch {
       // presentPaywall errors are non-fatal
     }

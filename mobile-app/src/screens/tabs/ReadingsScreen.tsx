@@ -229,9 +229,9 @@ export default function ReadingsScreen({ navigation: _navigation }: ReadingsScre
     )
   }, [generateForecast])
 
-  const handleUnlockPress = useCallback(async () => {
+  const handleUnlockPress = useCallback(async (source: string) => {
     try {
-      await presentPaywall()
+      await presentPaywall(source)
     } catch (err) {
       console.warn('[ReadingsScreen] presentPaywall threw:', err)
     }
@@ -357,7 +357,7 @@ export default function ReadingsScreen({ navigation: _navigation }: ReadingsScre
               eyebrow="Full Archetype Reading"
               title="Shadow, gifts, and the patterns that shape your life"
               description="The complete psychological framework of your archetype — how you move through the world, your shadow side, your core gifts, and how you show up in love and work."
-              onUnlockPress={handleUnlockPress}
+              onUnlockPress={() => handleUnlockPress('feature_archetype')}
             />
           )}
         </View>
@@ -478,7 +478,7 @@ export default function ReadingsScreen({ navigation: _navigation }: ReadingsScre
               eyebrow="Complete Natal Chart"
               title="Every planet. Every house. Your full birth chart."
               description="All 10 planets in your chart — their signs, houses, aspects, and what each placement means for you personally."
-              onUnlockPress={handleUnlockPress}
+              onUnlockPress={() => handleUnlockPress('feature_natal_chart')}
             />
           )}
         </View>
@@ -598,7 +598,7 @@ export default function ReadingsScreen({ navigation: _navigation }: ReadingsScre
               eyebrow="90-Day Forecast"
               title="The major themes, transits, and timing ahead"
               description="Month-by-month planetary guidance — key transits, peak periods, and how to move through each phase with your chart in mind."
-              onUnlockPress={handleUnlockPress}
+              onUnlockPress={() => handleUnlockPress('feature_forecast')}
             />
           )}
         </View>

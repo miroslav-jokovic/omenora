@@ -1,9 +1,11 @@
 import React, { useState, useCallback } from 'react'
 import { Modal, Pressable, StyleSheet, View } from 'react-native'
+import * as Sentry from '@sentry/react-native'
 import Animated, { FadeInDown } from 'react-native-reanimated'
 import { Text, Button } from '../atoms'
 import { Card } from '../organisms'
 import { usePurchases } from '../../context/usePurchases'
+import { track } from '../../lib/analytics'
 import { tokens, space, layout, radius, duration as motionDuration } from '../../design/tokens'
 
 export type BoostPackIdentifier = 'spark' | 'insight' | 'ascend'
@@ -48,11 +50,13 @@ export const BoostPackSheet: React.FC<BoostPackSheetProps> = ({
     setErrorMessage(null)
     try {
       await purchaseBoostPack(packId)
+      track('boost_pack_purchased', { pack: packId })
       onPurchaseSuccess(packId)
       onDismiss()
     } catch (err) {
       const e = err as { userCancelled?: boolean; message?: string }
       if (!e.userCancelled) {
+        Sentry.captureException(err, { tags: { flow: 'purchase_boost', pack: packId } })
         setErrorMessage(e.message ?? "Couldn't complete the purchase. Try again or contact support@omenora.com.")
       }
     } finally {

@@ -20,6 +20,7 @@ import { detectCrisisKeywords } from '../../utils/crisis'
 import { timeUntil } from '../../utils/time'
 import { space, layout, tokens } from '../../design/tokens'
 import type { CounselChatScreenProps } from '../../navigation/types'
+import { track } from '../../lib/analytics'
 
 // ── Local types ───────────────────────────────────────────────────────────────
 
@@ -122,6 +123,7 @@ export default function CounselChatScreen({ navigation, route }: CounselChatScre
         },
       ])
       setInput('')
+      track('counsel_cap_reached', { trigger: 'client' })
       setBoostSheetVisible(true)
       return
     }
@@ -175,6 +177,7 @@ export default function CounselChatScreen({ navigation, route }: CounselChatScre
               : "You've reached this month's counsel limit. Tap below to add more conversations.",
           },
         ])
+        track('counsel_cap_reached', { trigger: 'server' })
         setBoostSheetVisible(true)
         return
       }

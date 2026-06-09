@@ -33,7 +33,7 @@ export default function CounselScreen({ navigation }: CounselScreenProps) {
 
   const handleStartChat = useCallback(async () => {
     try {
-      await presentPaywall()
+      await presentPaywall('counsel_start')
     } catch (err) {
       console.warn('[Counsel] presentPaywall threw:', err)
     }
@@ -129,7 +129,7 @@ export default function CounselScreen({ navigation }: CounselScreenProps) {
         onUpgrade={async () => {
           setUpsellPackId(null)
           try {
-            await presentPaywall()
+            await presentPaywall('counsel_post_boost_upsell')
           } catch (err) {
             console.warn('[Counsel] presentPaywall threw:', err)
           }

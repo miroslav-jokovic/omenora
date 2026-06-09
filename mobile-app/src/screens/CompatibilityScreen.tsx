@@ -97,7 +97,7 @@ export const CompatibilityScreen: React.FC<CompatibilityScreenProps> = ({ naviga
         if (compatibilityAddonOffering !== null) {
           setIapSheetVisible(true)
         } else {
-          await presentPaywall()
+          await presentPaywall('compatibility_gate')
         }
         return
       }
@@ -124,7 +124,7 @@ export const CompatibilityScreen: React.FC<CompatibilityScreenProps> = ({ naviga
       setIapSheetVisible(true)
     } else {
       try {
-        await presentPaywall()
+        await presentPaywall('compatibility_locked')
       } catch (err) {
         console.warn('[Compatibility] presentPaywall threw:', err)
       }
