@@ -8,8 +8,8 @@ import {
   StyleSheet,
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { MessageCircle, BookOpen, X } from 'lucide-react-native'
-import { Text, DimensionIcon } from '../../components/atoms'
+import { MessageCircle, BookOpen, X, Heart, Calendar } from 'lucide-react-native'
+import { Text, Button, DimensionIcon } from '../../components/atoms'
 import { Card, LockedCard } from '../../components/organisms'
 import MoonPhaseHero from '../../components/hero/MoonPhaseHero'
 import { AtmosphericBackground } from '../../components/atmosphere'
@@ -24,8 +24,10 @@ import { tokens, space, layout } from '../../design/tokens'
 import type { TodayScreenProps } from '../../navigation/types'
 import { track } from '../../lib/analytics'
 
+const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000
+
 export default function TodayScreen({ navigation }: TodayScreenProps) {
-  const { firstName, archetype, sunSign, languageOverride, hasSeenTodayIntro, setHasSeenTodayIntro } = useProfileStore()
+  const { firstName, archetype, sunSign, languageOverride, hasSeenTodayIntro, setHasSeenTodayIntro, premiumTeaserDismissedAt, setPremiumTeaserDismissedAt } = useProfileStore()
   const { displayName } = useAuth()
   const { isPremium, presentPaywall } = usePurchases()
 
@@ -106,13 +108,10 @@ export default function TodayScreen({ navigation }: TodayScreenProps) {
   const archetypeContent = useMemo(() => {
     if (!data?.archetypes) return null
     const key = archetype?.toLowerCase() ?? ''
-    if (data.archetypes[key]) return data.archetypes[key]
-    const keys = Object.keys(data.archetypes)
-    if (keys.length > 0) {
-      console.warn(`[TodayScreen] archetype '${key}' not in cache — falling back to '${keys[0]}'`)
-      return data.archetypes[keys[0]]
-    }
-    return null
+    // Return only the user's own archetype content. If it is missing/unmatched
+    // (e.g. no profile yet), return null and let the empty/error state render —
+    // never fall back to a different archetype's reading. (UX-13)
+    return data.archetypes[key] ?? null
   }, [data, archetype])
 
   const zodiacContent = useMemo(() => {
@@ -127,6 +126,14 @@ export default function TodayScreen({ navigation }: TodayScreenProps) {
     [archetypeContent]
   )
   const insightP1 = insightParagraphs[0] ?? ''
+
+  const showReturningTeaser =
+    storeHydrated && !isPremium && hasSeenTodayIntro &&
+    (premiumTeaserDismissedAt === null || Date.now() - premiumTeaserDismissedAt > SEVEN_DAYS_MS)
+
+  useEffect(() => {
+    if (showReturningTeaser) track('today_premium_teaser_shown')
+  }, [showReturningTeaser])
 
   // ── Loading state ──────────────────────────────────────────────────────────
   if (loading) {
@@ -193,6 +200,11 @@ export default function TodayScreen({ navigation }: TodayScreenProps) {
           <Text variant="body" color="primary">
             {insightP1}
           </Text>
+          {!isPremium && (
+            <Text variant="micro" color="tertiary" style={styles.freeTag}>
+              Your free reading for today
+            </Text>
+          )}
         </View>
 
         {/* ── 3. Dimension cards — Love, Work, Health (zodiac only) — PREMIUM ── */}
@@ -292,6 +304,33 @@ export default function TodayScreen({ navigation }: TodayScreenProps) {
           </Card>
         )}
 
+        {/* ── 6c. Returning-free-user premium teaser — frequency-capped (MC-2) ─── */}
+        {showReturningTeaser && (
+          <Card variant="glass" padding="default">
+            <View style={styles.introHeader}>
+              <Text variant="eyebrow" color="secondary">Your full chart awaits</Text>
+              <Pressable
+                onPress={() => setPremiumTeaserDismissedAt(Date.now())}
+                hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+                accessibilityLabel="Dismiss"
+                accessibilityRole="button"
+              >
+                <X size={18} color={tokens.text.tertiary} />
+              </Pressable>
+            </View>
+            <Text variant="caption" color="secondary" style={styles.introBody}>
+              Your full archetype portrait, every planet in your natal chart, your 90-day forecast, daily guidance written for your chart — and Counsel, your AI astrologer, on call.
+            </Text>
+            <Button
+              label="Unlock Premium"
+              variant="premium"
+              fullWidth
+              onPress={async () => { await presentPaywall('today_returning_user') }}
+              style={styles.teaserCta}
+            />
+          </Card>
+        )}
+
         {/* ── 7. Deeper insight — LockedCard for free users ─── */}
         {!isPremium && (
           <LockedCard
@@ -310,6 +349,26 @@ export default function TodayScreen({ navigation }: TodayScreenProps) {
             description="How today lands for your Love, Work, and Health — guidance for each, read from your chart and today's transits."
             onUnlockPress={async () => { await presentPaywall('today_dimensions') }}
           />
+        )}
+        {/* ── 9. Explore — surface the paid funnels for free users (MC-3) ─── */}
+        {!isPremium && (
+          <Card variant="content" padding="compact">
+            <Text variant="micro" color="tertiary" style={styles.sectionLabel}>Explore</Text>
+            <ListItem
+              label="Compatibility"
+              meta="See how your chart connects with someone"
+              icon={Heart}
+              showChevron
+              onPress={() => { track('explore_tapped', { feature: 'compatibility' }); navigation.navigate('Compatibility') }}
+            />
+            <ListItem
+              label="Lucky Timing Calendar"
+              meta="Your luckiest dates in 2026"
+              icon={Calendar}
+              showChevron
+              onPress={() => { track('explore_tapped', { feature: 'calendar' }); navigation.navigate('Calendar') }}
+            />
+          </Card>
         )}
       </ScrollView>
       </SafeAreaView>
@@ -348,6 +407,9 @@ const styles = StyleSheet.create({
     marginBottom:  space['1'],
   },
   insightBlock: {},
+  freeTag: {
+    marginTop: space['2'],
+  },
   sectionLabel: {
     marginBottom: space['2'],
   },
@@ -361,5 +423,8 @@ const styles = StyleSheet.create({
   },
   introBody: {
     marginTop: space['3'],
+  },
+  teaserCta: {
+    marginTop: space['4'],
   },
 })

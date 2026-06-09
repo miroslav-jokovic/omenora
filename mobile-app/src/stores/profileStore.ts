@@ -77,6 +77,10 @@ export interface ProfileState {
   boostUpsellDismissedAt: number | null;
   setBoostUpsellDismissedAt: (ts: number | null) => void;
 
+  // Returning-free-user premium teaser frequency cap (MC-2)
+  premiumTeaserDismissedAt: number | null;
+  setPremiumTeaserDismissedAt: (ts: number | null) => void;
+
   // Analytics preferences
   analyticsEnabled: boolean;
   setAnalyticsEnabled: (enabled: boolean) => void;
@@ -149,6 +153,7 @@ const initialState = {
   saveDeclineCount: 0,
   saveLastDeclinedAt: null,
   boostUpsellDismissedAt: null,
+  premiumTeaserDismissedAt: null,
 };
 
 export const useProfileComplete = () =>
@@ -189,6 +194,7 @@ export const useProfileStore = create<ProfileState>()(
       setSaveDeclineCount: (saveDeclineCount) => set({ saveDeclineCount }),
       setSaveLastDeclinedAt: (saveLastDeclinedAt) => set({ saveLastDeclinedAt }),
       setBoostUpsellDismissedAt: (boostUpsellDismissedAt) => set({ boostUpsellDismissedAt }),
+      setPremiumTeaserDismissedAt: (premiumTeaserDismissedAt) => set({ premiumTeaserDismissedAt }),
 
       setAnalyticsEnabled: (analyticsEnabled) => set({ analyticsEnabled }),
 
@@ -288,6 +294,7 @@ export const useProfileStore = create<ProfileState>()(
         saveDeclineCount: state.saveDeclineCount,
         saveLastDeclinedAt: state.saveLastDeclinedAt,
         boostUpsellDismissedAt: state.boostUpsellDismissedAt,
+        premiumTeaserDismissedAt: state.premiumTeaserDismissedAt,
       }),
     }
   )
