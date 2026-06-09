@@ -3,6 +3,7 @@ import { Platform, StyleSheet } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Sun, BookOpen, MessageCircle, MoreHorizontal, type LucideIcon } from 'lucide-react-native';
 import { TabParamList } from './types';
+import { ScreenErrorBoundary } from '../components/templates';
 import { tokens, typeScale } from '../design/tokens';
 import TodayScreen from '../screens/tabs/TodayScreen';
 import ReadingsScreen from '../screens/tabs/ReadingsScreen';
@@ -20,6 +21,9 @@ const TAB_CONFIG: Record<keyof TabParamList, { label: string; icon: LucideIcon }
 
 export const TabNavigator: React.FC = () => (
   <Tab.Navigator
+    screenLayout={({ children }) => (
+      <ScreenErrorBoundary>{children}</ScreenErrorBoundary>
+    )}
     screenOptions={({ route }) => {
       const cfg = TAB_CONFIG[route.name as keyof TabParamList];
       return {

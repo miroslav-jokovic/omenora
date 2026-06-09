@@ -7,18 +7,17 @@ import { Header, Card } from '../../components/organisms'
 import { ListItem } from '../../components/molecules'
 import { Text } from '../../components/atoms'
 import { tokens, space, layout } from '../../design/tokens'
-import { useAuth } from '../../context/useAuth'
+import api from '../../api/endpoints'
 import type { NotificationsScreenProps } from '../../navigation/types'
 
 export default function NotificationsScreen({ navigation }: NotificationsScreenProps) {
-  const { session } = useAuth()
   const [pushEnabled, setPushEnabled] = useState(false)
   const [busy, setBusy] = useState(false)
 
   useEffect(() => {
-    Notifications.getPermissionsAsync().then((perm) => {
-      setPushEnabled(perm.status === 'granted')
-    })
+    Notifications.getPermissionsAsync()
+      .then((perm) => setPushEnabled(perm.status === 'granted'))
+      .catch(() => setPushEnabled(false))
   }, [])
 
   const handleToggle = async (newValue: boolean) => {
@@ -28,17 +27,7 @@ export default function NotificationsScreen({ navigation }: NotificationsScreenP
       const expoPushToken = await Notifications.getExpoPushTokenAsync({
         projectId: Constants.expoConfig?.extra?.eas?.projectId,
       })
-      const apiBaseUrl = process.env.EXPO_PUBLIC_API_BASE_URL
-      if (!apiBaseUrl) throw new Error('API base URL not configured')
-      const resp = await fetch(`${apiBaseUrl}/api/notifications/register`, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${session?.access_token ?? ''}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ token: expoPushToken.data, platform: Platform.OS }),
-      })
-      if (!resp.ok) throw new Error('Notification registration failed')
+      await api.registerPushToken({ token: expoPushToken.data, platform: Platform.OS })
       setPushEnabled(true)
     }
 

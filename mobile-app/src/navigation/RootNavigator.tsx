@@ -3,6 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { tokens } from '../design/tokens';
 import { createNavigationContainerRef } from '@react-navigation/native';
 import { RootStackParamList } from './types';
+import { ScreenErrorBoundary } from '../components/templates';
 import { TabNavigator } from './TabNavigator';
 import SplashScreen             from '../screens/onboarding/SplashScreen';
 import WelcomeScreen            from '../screens/onboarding/WelcomeScreen';
@@ -39,6 +40,9 @@ export const RootNavigator: React.FC = () => {
   return (
     <Stack.Navigator
       initialRouteName="Splash"
+      screenLayout={({ children }) => (
+        <ScreenErrorBoundary>{children}</ScreenErrorBoundary>
+      )}
       screenOptions={{
         headerShown:  false,
         contentStyle: { backgroundColor: tokens.surface.base },

@@ -402,6 +402,11 @@ export const api = {
     const response = await apiClient.post<CounselMessageResponse>('/api/counsel/message', data);
     return response.data;
   },
+
+  // Push notifications
+  registerPushToken: async (data: { token: string; platform: string }): Promise<void> => {
+    await apiClient.post('/api/notifications/register', data);
+  },
 };
 
 export default api;

@@ -89,7 +89,7 @@ export default function MoreScreen({ navigation }: MoreScreenProps) {
                   navigation.dispatch(CommonActions.reset({ index: 0, routes: [{ name: 'Splash' }] }))
                 }
               } catch (err) {
-                Alert.alert('Could not sign out', String(err))
+                Alert.alert('Could not sign out', 'Something went wrong signing out. Please try again.')
               }
             },
           },
@@ -107,7 +107,7 @@ export default function MoreScreen({ navigation }: MoreScreenProps) {
           navigation.dispatch(CommonActions.reset({ index: 0, routes: [{ name: 'Splash' }] }))
         }
       } catch (err) {
-        Alert.alert('Could not sign out', String(err))
+        Alert.alert('Could not sign out', 'Something went wrong signing out. Please try again.')
       }
     }
   }, [signOut, isAnonymous, navigation])
@@ -200,7 +200,6 @@ export default function MoreScreen({ navigation }: MoreScreenProps) {
                 <View style={styles.divider} />
               </>
             )}
-            {/* Profile route not yet registered — Phase 6 */}
             <ListItem
               icon={User}
               label="Profile"
@@ -225,7 +224,6 @@ export default function MoreScreen({ navigation }: MoreScreenProps) {
               disabled={isRestoring}
             />
             <View style={styles.divider} />
-            {/* Notifications route not yet registered — Phase 6 */}
             <ListItem
               icon={Bell}
               label="Notifications"
@@ -233,7 +231,6 @@ export default function MoreScreen({ navigation }: MoreScreenProps) {
               showChevron
             />
             <View style={styles.divider} />
-            {/* Language selector — Phase 6 */}
             <ListItem
               icon={Globe}
               label="Language"

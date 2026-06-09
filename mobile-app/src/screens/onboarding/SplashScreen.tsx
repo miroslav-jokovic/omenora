@@ -124,7 +124,7 @@ export default function SplashScreen() {
     // — up to 3 total declines, spaced at least 24h apart.
     if (isProfileComplete && destination === 'MainTabs') {
       const { saveDeclineCount, saveLastDeclinedAt } = useProfileStore.getState()
-      const isAnon = (session.user as any)?.is_anonymous ?? true
+      const isAnon = session.user.is_anonymous ?? true
       const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000
       const cooldownElapsed =
         saveLastDeclinedAt === null ||

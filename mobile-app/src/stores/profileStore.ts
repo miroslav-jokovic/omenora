@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import * as Sentry from '@sentry/react-native';
 import type { CalendarData } from '../types/calendar';
 import type { ArchetypeReading, NatalChartReading, ForecastReading } from '../api/endpoints';
 import { persist, createJSONStorage } from 'zustand/middleware';
@@ -217,6 +218,8 @@ export const useProfileStore = create<ProfileState>()(
         } catch (err: any) {
           if (err instanceof ProfileSaveError && err.kind === 'network') {
             set({ pendingServerSync: true })
+          } else {
+            Sentry.captureException(err, { tags: { flow: 'profile_commit' } })
           }
           throw err
         }
