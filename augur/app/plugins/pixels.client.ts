@@ -1,4 +1,5 @@
 import posthog from 'posthog-js'
+import type { Session } from '@supabase/supabase-js'
 
 export default defineNuxtPlugin(() => {
   const config = useRuntimeConfig()
@@ -27,6 +28,23 @@ export default defineNuxtPlugin(() => {
       autocapture: false,
       persistence: 'localStorage+cookie',
     })
+
+    // Identity bridge: stitch web <-> mobile to one PostHog identity via the Supabase
+    // user id. `session` is the shared Nuxt useState ref also used by useAuth().
+    const authSession = useState<Session | null>('omenora-auth-session', () => null)
+    watch(
+      authSession,
+      (s, prev) => {
+        const uid = s?.user?.id
+        if (uid) {
+          posthog.identify(uid)
+        } else if (prev?.user?.id) {
+          // logged-in -> logged-out transition only (avoid churning anon id on load)
+          posthog.reset()
+        }
+      },
+      { immediate: true },
+    )
   }
 
   // ─── TikTok Pixel ──────────────────────────────────────────────────────────
