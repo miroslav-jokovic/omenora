@@ -1,22 +1,25 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Platform } from 'react-native'
+import * as Sentry from '@sentry/react-native'
 import Purchases, {
   LOG_LEVEL,
   type CustomerInfo,
   type MakePurchaseResult,
   type PurchasesError,
   type PurchasesOffering,
+  type PurchasesPackage,
   type PurchasesStoreProduct,
 } from 'react-native-purchases'
 import RevenueCatUI, { PAYWALL_RESULT } from 'react-native-purchases-ui'
 import { useAuth } from './useAuth'
 import { PurchasesContext } from './PurchasesContext'
+import { CustomPaywall } from '../components/organisms/CustomPaywall'
+import { deriveEntitlements } from '../lib/entitlements'
+import { track } from '../lib/analytics'
 
 interface Props {
   children: React.ReactNode
 }
-
-const PREMIUM_ENTITLEMENT_ID = 'premium'
 
 /**
  * RevenueCat provider.
@@ -39,6 +42,9 @@ export function PurchasesProvider({ children }: Props) {
   const [boostPacksOffering,         setBoostPacksOffering]         = useState<PurchasesOffering | null>(null)
   const [compatibilityAddonOffering, setCompatibilityAddonOffering] = useState<PurchasesOffering | null>(null)
   const [calendarProduct,            setCalendarProduct]            = useState<PurchasesStoreProduct | null>(null)
+  const [paywallVisible, setPaywallVisible] = useState(false)
+  const [paywallSource, setPaywallSource] = useState<string | undefined>(undefined)
+  const paywallResolver = useRef<((result: PAYWALL_RESULT) => void) | null>(null)
 
   // Initialize SDK once
   useEffect(() => {
@@ -90,6 +96,7 @@ export function PurchasesProvider({ children }: Props) {
       } catch (err: any) {
         const purchasesErr = err as PurchasesError
         console.error('[Purchases] init failed:', purchasesErr?.message ?? err)
+        Sentry.captureException(err, { tags: { flow: 'purchases_init' } })
         setIsReady(true) // Fail open — app should still work without purchases
       }
     }
@@ -149,6 +156,7 @@ export function PurchasesProvider({ children }: Props) {
         }
       } catch (err: any) {
         console.error('[Purchases] logIn failed:', err?.message ?? err)
+        Sentry.captureException(err, { tags: { flow: 'purchases_login' } })
       }
     }
 
@@ -164,16 +172,27 @@ export function PurchasesProvider({ children }: Props) {
     }
   }, [])
 
-  const presentPaywall = useCallback(async (): Promise<PAYWALL_RESULT> => {
-    try {
-      const result = await RevenueCatUI.presentPaywall()
-      console.log('[Purchases] paywall result:', result)
-      return result
-    } catch (e) {
-      console.error('[Purchases] paywall error:', e)
-      return PAYWALL_RESULT.ERROR
-    }
+  const presentPaywall = useCallback((source?: string): Promise<PAYWALL_RESULT> => {
+    return new Promise<PAYWALL_RESULT>((resolve) => {
+      paywallResolver.current = resolve
+      setPaywallSource(source)
+      setPaywallVisible(true)
+      track('paywall_viewed', { source: source ?? 'unknown' })
+    })
   }, [])
+
+  const handlePaywallPurchased = useCallback(() => {
+    setPaywallVisible(false)
+    paywallResolver.current?.(PAYWALL_RESULT.PURCHASED)
+    paywallResolver.current = null
+  }, [])
+
+  const handlePaywallClose = useCallback(() => {
+    setPaywallVisible(false)
+    track('paywall_dismissed', { source: paywallSource ?? 'unknown' })
+    paywallResolver.current?.(PAYWALL_RESULT.CANCELLED)
+    paywallResolver.current = null
+  }, [paywallSource])
 
   const purchaseBoostPack = useCallback(async (packageIdentifier: 'spark' | 'insight' | 'ascend'): Promise<MakePurchaseResult> => {
     if (!boostPacksOffering) {
@@ -224,31 +243,23 @@ export function PurchasesProvider({ children }: Props) {
     return restored
   }, [refreshCustomerInfo])
 
+  const purchaseSubscription = useCallback(async (pkg: PurchasesPackage): Promise<MakePurchaseResult> => {
+    const result = await Purchases.purchasePackage(pkg)
+    await refreshCustomerInfo()
+    return result
+  }, [refreshCustomerInfo])
+
   const presentCustomerCenter = useCallback(async (): Promise<void> => {
     await RevenueCatUI.presentCustomerCenter()
   }, [])
 
-  const presentPaywallIfNeeded = useCallback(async (entitlement = 'premium'): Promise<PAYWALL_RESULT> => {
-    try {
-      const result = await RevenueCatUI.presentPaywallIfNeeded({
-        requiredEntitlementIdentifier: entitlement,
-      })
-      console.log('[Purchases] paywallIfNeeded result:', result)
-      return result
-    } catch (e) {
-      console.error('[Purchases] paywallIfNeeded error:', e)
-      return PAYWALL_RESULT.ERROR
-    }
-  }, [])
+  const presentPaywallIfNeeded = useCallback((_entitlement = 'premium'): Promise<PAYWALL_RESULT> => {
+    const alreadyPremium = customerInfo?.entitlements?.active?.['premium'] !== undefined
+    if (alreadyPremium) return Promise.resolve(PAYWALL_RESULT.NOT_PRESENTED)
+    return presentPaywall()
+  }, [customerInfo, presentPaywall])
 
-  const isPremium =
-    customerInfo?.entitlements?.active?.[PREMIUM_ENTITLEMENT_ID] !== undefined
-
-  const hasCalendar = isPremium || (
-    customerInfo?.nonSubscriptionTransactions?.some(
-      t => t.productIdentifier === 'omenora_calendar_2026'
-    ) ?? false
-  )
+  const { isPremium, hasCalendar } = deriveEntitlements(customerInfo)
 
   return (
     <PurchasesContext.Provider
@@ -266,12 +277,19 @@ export function PurchasesProvider({ children }: Props) {
         presentPaywallIfNeeded,
         purchaseCalendar,
         restorePurchases,
+        purchaseSubscription,
         purchaseBoostPack,
         purchaseCompatibilitySingle,
         presentCustomerCenter,
       }}
     >
       {children}
+      <CustomPaywall
+        visible={paywallVisible}
+        source={paywallSource}
+        onClose={handlePaywallClose}
+        onPurchased={handlePaywallPurchased}
+      />
     </PurchasesContext.Provider>
   )
 }

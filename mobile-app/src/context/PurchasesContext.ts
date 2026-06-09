@@ -1,5 +1,5 @@
 import { createContext } from 'react'
-import type { CustomerInfo, MakePurchaseResult, PurchasesOffering, PurchasesStoreProduct } from 'react-native-purchases'
+import type { CustomerInfo, MakePurchaseResult, PurchasesOffering, PurchasesPackage, PurchasesStoreProduct } from 'react-native-purchases'
 import { PAYWALL_RESULT } from 'react-native-purchases-ui'
 
 export interface PurchasesContextValue {
@@ -12,10 +12,11 @@ export interface PurchasesContextValue {
   boostPacksOffering: PurchasesOffering | null
   compatibilityAddonOffering: PurchasesOffering | null
   refreshCustomerInfo: () => Promise<void>
-  presentPaywall: () => Promise<PAYWALL_RESULT>
+  presentPaywall: (source?: string) => Promise<PAYWALL_RESULT>
   presentPaywallIfNeeded: (entitlement?: string) => Promise<PAYWALL_RESULT>
   purchaseCalendar: () => Promise<MakePurchaseResult>
   restorePurchases: () => Promise<CustomerInfo>
+  purchaseSubscription: (pkg: PurchasesPackage) => Promise<MakePurchaseResult>
   purchaseBoostPack: (packageIdentifier: 'spark' | 'insight' | 'ascend') => Promise<MakePurchaseResult>
   purchaseCompatibilitySingle: () => Promise<MakePurchaseResult>
   presentCustomerCenter: () => Promise<void>
@@ -35,6 +36,7 @@ export const PurchasesContext = createContext<PurchasesContextValue>({
   presentPaywallIfNeeded: async () => PAYWALL_RESULT.ERROR,
   purchaseCalendar: () => Promise.reject(new Error('PurchasesProvider not mounted')),
   restorePurchases: () => Promise.reject(new Error('PurchasesProvider not mounted')),
+  purchaseSubscription: () => Promise.reject(new Error('PurchasesProvider not mounted')),
   purchaseBoostPack: () => Promise.reject(new Error('PurchasesProvider not mounted')),
   purchaseCompatibilitySingle: () => Promise.reject(new Error('PurchasesProvider not mounted')),
   presentCustomerCenter: async () => {},
