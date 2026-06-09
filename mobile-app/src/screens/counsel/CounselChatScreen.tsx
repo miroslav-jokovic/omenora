@@ -63,12 +63,27 @@ const nextId = (prefix: string) =>
 // ── Screen ────────────────────────────────────────────────────────────────────
 
 export default function CounselChatScreen({ navigation, route }: CounselChatScreenProps) {
-  const hasAcceptedCounselDisclosure = useProfileStore(
-    (s) => s.hasAcceptedCounselDisclosure
-  )
+  // Disclosure visibility is hydration-guarded: reading the persisted flag before
+  // Zustand rehydrates would wrongly re-show the disclosure to users who already
+  // accepted it. Start from the forced route param, then apply the persisted flag
+  // once hydration is known. (UX-5)
   const [disclosureVisible, setDisclosureVisible] = useState(
-    !hasAcceptedCounselDisclosure || (route.params?.showDisclosure ?? false)
+    route.params?.showDisclosure ?? false
   )
+
+  useEffect(() => {
+    const applyDisclosure = () => {
+      if (!useProfileStore.getState().hasAcceptedCounselDisclosure) {
+        setDisclosureVisible(true)
+      }
+    }
+    if (useProfileStore.persist.hasHydrated()) {
+      applyDisclosure()
+      return
+    }
+    const unsub = useProfileStore.persist.onFinishHydration(applyDisclosure)
+    return unsub
+  }, [])
 
   // ── Profile ────────────────────────────────────────────────────────────────
   const {

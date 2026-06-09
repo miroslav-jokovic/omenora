@@ -70,9 +70,6 @@ export default function CounselScreen({ navigation }: CounselScreenProps) {
                 fullWidth
                 onPress={() => navigation.navigate('CounselChat')}
               />
-              <Text variant="caption" color="tertiary">
-                Personal guidance from your full birth chart
-              </Text>
             </View>
           ) : (
             <>

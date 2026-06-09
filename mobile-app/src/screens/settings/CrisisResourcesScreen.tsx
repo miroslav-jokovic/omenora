@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, Pressable, Linking, ScrollView, StyleSheet } from 'react-native'
+import { View, Pressable, Linking, ScrollView, StyleSheet, Alert } from 'react-native'
 import { Phone, MessageSquare, Globe } from 'lucide-react-native'
 import { Text } from '../../components/atoms'
 import { Card, Header } from '../../components/organisms'
@@ -55,7 +55,13 @@ export default function CrisisResourcesScreen({ navigation }: CrisisResourcesScr
               </Text>
               <Pressable
                 style={styles.actionRow}
-                onPress={() => { void Linking.openURL(url) }}
+                onPress={() => {
+                  Linking.openURL(url).catch(() => {
+                    Alert.alert('Could not open', `Please reach out directly: ${actionLabel}.`)
+                  })
+                }}
+                accessibilityRole="button"
+                accessibilityLabel={actionLabel}
               >
                 <Icon size={18} color={tokens.accent.primary} />
                 <Text variant="label" color="accent">
