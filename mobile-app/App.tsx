@@ -12,6 +12,7 @@ import { AuthProvider } from './src/context/AuthProvider'
 import { PurchasesProvider } from './src/context/PurchasesProvider';
 import { RootNavigator, navigationRef } from './src/navigation/RootNavigator';
 import { useProfileStore } from './src/stores/profileStore';
+import { initAnalytics, setAnalyticsOptOut } from './src/lib/analytics';
 import {
   useFonts,
   Onest_300Light,
@@ -43,25 +44,36 @@ Sentry.init({
       delete headers['user-agent'];
       delete headers['User-Agent'];
     }
-    const scrubObject = (obj: Record<string, unknown>) => {
-      const PII_FIELDS = ['email', 'firstName', 'dateOfBirth', 'city', 'ip_address'];
-      const SECRET_PATTERN = /token|secret|key|password/i;
-      for (const field of PII_FIELDS) {
-        if (field in obj) obj[field] = '[Filtered]';
+    const PII_FIELDS = ['email', 'firstName', 'dateOfBirth', 'city', 'ip_address'];
+    const SECRET_PATTERN = /token|secret|key|password/i;
+    const MAX_DEPTH = 4;
+    const scrub = (value: unknown, depth: number): void => {
+      if (depth > MAX_DEPTH || value === null || typeof value !== 'object') return;
+      if (Array.isArray(value)) {
+        for (const item of value) scrub(item, depth + 1);
+        return;
       }
+      const obj = value as Record<string, unknown>;
       for (const field of Object.keys(obj)) {
-        if (SECRET_PATTERN.test(field)) obj[field] = '[Filtered]';
+        if (PII_FIELDS.includes(field) || SECRET_PATTERN.test(field)) {
+          obj[field] = '[Filtered]';
+        } else {
+          scrub(obj[field], depth + 1);
+        }
       }
     };
-    if (event.request?.data && typeof event.request.data === 'object') {
-      scrubObject(event.request.data as Record<string, unknown>);
-    }
-    if (event.extra && typeof event.extra === 'object') {
-      scrubObject(event.extra as Record<string, unknown>);
+    if (event.request?.data) scrub(event.request.data, 0);
+    if (event.extra) scrub(event.extra, 0);
+    if (event.breadcrumbs) {
+      for (const crumb of event.breadcrumbs) {
+        if (crumb.data) scrub(crumb.data, 0);
+      }
     }
     return event;
   },
 });
+
+initAnalytics()
 
 function DeepLinkHandler() {
   const { handleMagicLinkUrl } = useAuth()
@@ -69,7 +81,7 @@ function DeepLinkHandler() {
   useEffect(() => {
     // Handle URL when app is already open
     const subscription = Linking.addEventListener('url', ({ url }) => {
-      console.log('[DeepLink] Received URL:', url)
+      console.log('[DeepLink] Received URL:', url.split('?')[0])
       if (url.includes('token_hash=')) {
         handleMagicLinkUrl(url)
       }
@@ -78,7 +90,7 @@ function DeepLinkHandler() {
     // Handle URL when app is opened cold from a link
     Linking.getInitialURL().then((url) => {
       if (url) {
-        console.log('[DeepLink] Initial URL:', url)
+        console.log('[DeepLink] Initial URL:', url.split('?')[0])
         if (url.includes('token_hash=')) {
           handleMagicLinkUrl(url)
         }
@@ -96,6 +108,7 @@ function DeepLinkHandler() {
 function App() {
   const [appIsReady, setAppIsReady] = useState(false);
   const initializeStore = useProfileStore((state) => state.initialize);
+  const analyticsEnabled = useProfileStore((state) => state.analyticsEnabled);
 
   const [fontsLoaded] = useFonts({
     Onest_300Light,
@@ -118,6 +131,10 @@ function App() {
     }
     prepare();
   }, [initializeStore]);
+
+  useEffect(() => {
+    setAnalyticsOptOut(!analyticsEnabled);
+  }, [analyticsEnabled]);
 
   const onLayoutRootView = useCallback(async () => {
     if (appIsReady && fontsLoaded) {

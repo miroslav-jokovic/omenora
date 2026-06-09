@@ -9,6 +9,7 @@ import { supabase } from '../lib/supabase'
 import { useProfileStore } from '../stores/profileStore'
 import { fetchProfile, saveProfile } from '../services/profileService'
 import { AuthGate } from '../components/organisms/AuthGate'
+import { identifyUser, resetAnalytics } from '../lib/analytics'
 import { AuthContext, type AuthContextValue } from './AuthContext'
 
 const GOOGLE_IOS_CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID
@@ -84,6 +85,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // On permanent sign-in: transfer anonymous data (first-time) then hydrate profileStore
       if (event === 'SIGNED_IN' && newSession?.user && !newSession.user.is_anonymous) {
         const targetId = newSession.user.id
+        identifyUser(targetId)
 
         // ── Transfer from anonymous session (onboarding path only) ─────────────
         if (
@@ -104,6 +106,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 previousAnonymousUserIdRef.current = null
               } else {
                 console.error('[Auth] transfer_anonymous_user failed:', error.message)
+                Sentry.captureException(
+                  new Error(`transfer_anonymous_user failed: ${error.message}`),
+                  { tags: { flow: 'anon_transfer' } },
+                )
               }
             } else {
               console.log('[Auth] transfer succeeded:', data)
@@ -195,6 +201,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // Reset local profile state so the anonymous bootstrap sees a clean store.
         try {
           useProfileStore.getState().reset()
+          resetAnalytics()
         } catch (resetErr: any) {
           console.warn('[Auth] resetProfile in SIGNED_OUT handler failed:', resetErr?.message)
         }
@@ -287,6 +294,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (err: any) {
       if (err?.code === 'ERR_REQUEST_CANCELED') return
       console.error('[Auth] Apple sign-in error:', err)
+      Sentry.captureException(err, { tags: { flow: 'auth_apple' } })
       Alert.alert('Sign In Failed', err?.message ?? 'Could not sign in with Apple.')
     }
   }, [])
@@ -295,11 +303,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true })
       const userInfo = await GoogleSignin.signIn()
-      console.log('[Auth] Google userInfo shape:', JSON.stringify(userInfo, null, 2))
       const idToken = userInfo?.data?.idToken ?? (userInfo as any)?.idToken
 
       if (!idToken) {
-        console.error('[Auth] Google sign-in: idToken missing. Full userInfo:', userInfo)
+        console.error('[Auth] Google sign-in: idToken missing')
         throw new Error('Google Sign In: no ID token returned')
       }
 
@@ -312,6 +319,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (err: any) {
       if (err?.code === statusCodes.SIGN_IN_CANCELLED) return
       console.error('[Auth] Google sign-in error:', err)
+      Sentry.captureException(err, { tags: { flow: 'auth_google' } })
       Alert.alert('Sign In Failed', err?.message ?? 'Could not sign in with Google.')
     }
   }, [])
@@ -397,7 +405,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // 2. RevenueCat sign out — only for identified (non-anonymous) users.
       //    Purchases.logOut() throws if the RC user is already anonymous.
       const { data: { session: currentSession } } = await supabase.auth.getSession()
-      if (currentSession && !(currentSession.user as any).is_anonymous) {
+      if (currentSession && !currentSession.user.is_anonymous) {
         try {
           await Purchases.logOut()
         } catch (rcErr) {
@@ -434,7 +442,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const showAuthGate = useCallback((options?: { title?: string; body?: string }) => {
     const currentSession = session
-    if (currentSession && !(currentSession.user as any).is_anonymous) {
+    if (currentSession && !currentSession.user.is_anonymous) {
       console.warn('[Auth] showAuthGate called but user is already permanent')
       return
     }
@@ -499,6 +507,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     } catch (err: any) {
       console.error('[Auth] deleteAccount failed:', err?.message)
+      Sentry.captureException(err, { tags: { flow: 'account_delete' } })
       Alert.alert(
         'Account Deletion Failed',
         err?.message ?? 'Could not delete your account. Please try again or contact support@omenora.com.'
@@ -553,7 +562,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const value: AuthContextValue = {
     session,
     user: session?.user ?? null,
-    isAnonymous: (session?.user as any)?.is_anonymous ?? false,
+    isAnonymous: session?.user?.is_anonymous ?? false,
     isLoading,
     profileHydrating,
     profileHydrated,
