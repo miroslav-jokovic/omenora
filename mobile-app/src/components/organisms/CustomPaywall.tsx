@@ -1,8 +1,10 @@
 import React, { useState } from 'react'
 import { Modal, View, Pressable, StyleSheet } from 'react-native'
+import * as Haptics from 'expo-haptics'
 import * as Sentry from '@sentry/react-native'
 import type { PurchasesPackage } from 'react-native-purchases'
 import { Text, Button, EditorialBenefit } from '../atoms'
+import { PlanComparisonTable } from '../molecules/PlanComparisonTable'
 import { PaywallShell } from '../templates'
 import { usePurchases } from '../../context/usePurchases'
 import { track } from '../../lib/analytics'
@@ -58,6 +60,23 @@ export const CustomPaywall: React.FC<CustomPaywallProps> = ({ visible, onClose, 
   const priceFor = (key: PlanKey): string =>
     packageFor(key)?.product.priceString ?? FALLBACK_PRICE[key]
 
+  // Live-only derived math — never computed from FALLBACK_PRICE
+  const perMonthFor = (key: 'annual'): string | null => {
+    const pkg = packageFor(key)
+    if (pkg == null) return null
+    const monthly = pkg.product.price / 12
+    return new Intl.NumberFormat(undefined, { style: 'currency', currency: pkg.product.currencyCode }).format(monthly) + '/mo'
+  }
+
+  const savingsVsWeekly = (): number | null => {
+    const annualPkg  = packageFor('annual')
+    const weeklyPkg  = packageFor('weekly')
+    if (annualPkg == null || weeklyPkg == null) return null
+    const pct = Math.round((1 - annualPkg.product.price / (weeklyPkg.product.price * 52)) * 100)
+    if (pct < 1 || pct > 99) return null
+    return pct
+  }
+
   const isDisabled = isPurchasing || isRestoring
 
   const openLegal = (route: 'Terms' | 'Privacy') => {
@@ -109,6 +128,8 @@ export const CustomPaywall: React.FC<CustomPaywallProps> = ({ visible, onClose, 
     }
   }
 
+  const selectedMeta = PLAN_META.find((p) => p.key === selected)!
+
   if (!visible) return null
 
   return (
@@ -137,33 +158,65 @@ export const CustomPaywall: React.FC<CustomPaywallProps> = ({ visible, onClose, 
               90-day forecast, daily guidance written for your chart — and Counsel, your AI
               astrologer, on call.
             </EditorialBenefit>
+            <Text variant="caption" color="secondary" style={styles.trustLine}>
+              Every word calculated from your exact birth moment — not a sun-sign guess.
+            </Text>
+            <PlanComparisonTable />
           </View>
         }
         planSelector={
           <View style={styles.plans}>
             {PLAN_META.map((p) => {
               const isSel = selected === p.key
+              const pPerMonth = p.key === 'annual' ? perMonthFor('annual') : null
+              const pSavings  = p.key === 'annual' ? savingsVsWeekly()    : null
+              const a11yExtras = [
+                pPerMonth != null ? `about ${pPerMonth} per month` : null,
+                pSavings  != null ? `save ${pSavings} percent`     : null,
+                p.badge   != null ? 'best value'                   : null,
+              ].filter(Boolean).join(', ')
               return (
-                <Pressable
-                  key={p.key}
-                  onPress={() => setSelected(p.key)}
-                  disabled={isDisabled}
-                  accessibilityRole="radio"
-                  accessibilityState={{ selected: isSel, disabled: isDisabled }}
-                  accessibilityLabel={`${p.label}, ${priceFor(p.key)} ${p.cadence}${p.badge ? ', best value' : ''}`}
-                  style={[styles.planRow, isSel && styles.planRowSelected]}
-                >
-                  <View style={styles.planLeft}>
-                    <Text variant="label" color="primary">{p.label}</Text>
-                    <Text variant="caption" color="tertiary">{p.cadence}</Text>
-                  </View>
+                <View key={p.key} style={p.badge != null ? styles.planRowWithBadge : undefined}>
                   {p.badge != null && (
-                    <View style={styles.badge}>
-                      <Text variant="micro" color="accent">{p.badge}</Text>
+                    <View style={styles.badgePill}>
+                      <Text variant="micro" style={styles.badgePillText}>{p.badge}</Text>
                     </View>
                   )}
-                  <Text variant="heading2" color="primary">{priceFor(p.key)}</Text>
-                </Pressable>
+                  <Pressable
+                    onPress={() => { Haptics.selectionAsync(); setSelected(p.key) }}
+                    disabled={isDisabled}
+                    accessibilityRole="radio"
+                    accessibilityState={{ selected: isSel, disabled: isDisabled }}
+                    accessibilityLabel={`${p.label}, ${priceFor(p.key)} ${p.cadence}${a11yExtras.length > 0 ? ', ' + a11yExtras : ''}`}
+                    style={[styles.planRow, isSel ? styles.planRowSelected : styles.planRowUnselected]}
+                  >
+                    <View style={styles.radioCol}>
+                      <View style={[styles.radioOuter, isSel && styles.radioOuterSelected]}>
+                        {isSel && <View style={styles.radioDot} />}
+                      </View>
+                    </View>
+                    <View style={styles.planLeft}>
+                      <Text variant="label" color="primary">{p.label}</Text>
+                      <Text variant="caption" color="tertiary">{p.cadence}</Text>
+                      {pSavings != null && (
+                        <View style={styles.savingsChip}>
+                          <Text variant="subMicro" style={styles.savingsChipText}>SAVE {pSavings}%</Text>
+                        </View>
+                      )}
+                    </View>
+                    <View style={styles.priceCol}>
+                      <Text
+                        variant={isSel ? 'heading1' : 'heading2'}
+                        color="primary"
+                      >
+                        {priceFor(p.key)}
+                      </Text>
+                      {pPerMonth != null && (
+                        <Text variant="caption" style={styles.perMonth}>{pPerMonth}</Text>
+                      )}
+                    </View>
+                  </Pressable>
+                </View>
               )
             })}
           </View>
@@ -171,12 +224,22 @@ export const CustomPaywall: React.FC<CustomPaywallProps> = ({ visible, onClose, 
         primaryCta={
           <Button
             label="Unlock Premium"
-            variant="premium"
+            variant="cta"
             fullWidth
             loading={isPurchasing}
             disabled={isDisabled}
             onPress={handleContinue}
           />
+        }
+        ctaSubline={
+          <Text variant="caption" color="tertiary" style={styles.ctaSubline}>
+            {priceFor(selected)} {selectedMeta.cadence} · cancel anytime in the App Store
+          </Text>
+        }
+        footerAction={
+          <Pressable onPress={onClose} disabled={isDisabled} accessibilityRole="button" hitSlop={8}>
+            <Text variant="label" color="tertiary">Maybe later</Text>
+          </Pressable>
         }
         secondaryAction={
           <View style={styles.secondary}>
@@ -193,9 +256,6 @@ export const CustomPaywall: React.FC<CustomPaywallProps> = ({ visible, onClose, 
               <Text variant="caption" color="tertiary" style={styles.restore}>
                 {isRestoring ? 'Restoring…' : 'Restore Purchases'}
               </Text>
-            </Pressable>
-            <Pressable onPress={onClose} disabled={isDisabled} accessibilityRole="button" hitSlop={8}>
-              <Text variant="label" color="tertiary">Maybe later</Text>
             </Pressable>
           </View>
         }
@@ -224,27 +284,79 @@ export const CustomPaywall: React.FC<CustomPaywallProps> = ({ visible, onClose, 
 const styles = StyleSheet.create({
   eyebrow: { textTransform: 'uppercase', letterSpacing: 2, marginBottom: space['2'], textAlign: 'center' },
   archetype: { textAlign: 'center' },
+  trustLine: { textAlign: 'center', marginTop: space['5'] },
   features: { gap: space['5'] },
-  plans: { gap: space['3'] },
+  // Plans container — overflow visible so the badge chip can overlap the card top edge
+  plans: { gap: space['3'], overflow: 'visible' },
+  // Wrapper that gives the annual card extra marginTop to make room for the badge
+  planRowWithBadge: { marginTop: space['2'] },
   planRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: space['3'],
     paddingVertical: space['4'],
     paddingHorizontal: space['4'],
-    borderWidth: 1,
-    borderColor: tokens.border.subtle,
+    borderWidth: 2,
     borderRadius: radius.lg,
   },
-  planRowSelected: { borderColor: tokens.border.accent },
-  planLeft: { flex: 1, gap: space['0.5'] },
-  badge: {
-    borderWidth: 1,
-    borderColor: tokens.border.accent,
-    borderRadius: radius.xs,
-    paddingVertical: space['0.5'],
-    paddingHorizontal: space['2'],
+  // Unselected: muted border, slightly transparent; borderWidth stays 2 to prevent layout jump
+  planRowUnselected: {
+    borderColor: tokens.border.subtle,
+    opacity: 0.85,
   },
+  // Selected: accent border + subtle accent fill
+  planRowSelected: {
+    borderColor: tokens.accent.emphasis,
+    backgroundColor: tokens.accent.subtle,
+    opacity: 1,
+  },
+  // Leading radio glyph
+  radioCol: { width: 20, height: 20, alignItems: 'center', justifyContent: 'center' },
+  radioOuter: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    borderWidth: 1.5,
+    borderColor: tokens.border.strong,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  radioOuterSelected: {
+    borderWidth: 0,
+    backgroundColor: tokens.accent.emphasis,
+  },
+  radioDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: tokens.text.inverse,
+  },
+  planLeft: { flex: 1, gap: space['0.5'] },
+  priceCol: { alignItems: 'flex-end', gap: space['0.5'] },
+  perMonth: { color: tokens.accent.emphasis },
+  // Savings chip — left side under cadence line
+  savingsChip: {
+    alignSelf: 'flex-start',
+    backgroundColor: tokens.accent.primary,
+    borderRadius: radius.xs,
+    paddingHorizontal: space['2'],
+    paddingVertical: space['0.5'],
+    marginTop: space['1'],
+  },
+  savingsChipText: { color: tokens.text.inverse },
+  // Filled "BEST VALUE" badge overlapping card top edge
+  badgePill: {
+    position: 'absolute',
+    top: -10,
+    left: space['4'],
+    zIndex: 1,
+    backgroundColor: tokens.accent.primary,
+    borderRadius: radius.pill,
+    paddingHorizontal: 10,
+    paddingVertical: 2,
+  },
+  badgePillText: { color: tokens.text.inverse },
+  ctaSubline: { textAlign: 'center' },
   secondary: { alignItems: 'center', gap: space['3'] },
   error: { textAlign: 'center' },
   restore: { textDecorationLine: 'underline' },

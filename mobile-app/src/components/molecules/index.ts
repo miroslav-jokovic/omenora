@@ -33,3 +33,5 @@ export type { CalendarIAPSheetProps } from './CalendarIAPSheet'
 
 export { PostPurchaseUpsellSheet } from './PostPurchaseUpsellSheet'
 export type { PostPurchaseUpsellSheetProps } from './PostPurchaseUpsellSheet'
+
+export { PlanComparisonTable } from './PlanComparisonTable'
