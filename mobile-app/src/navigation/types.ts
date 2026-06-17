@@ -23,6 +23,7 @@ export type RootStackParamList = {
   BigThreeReveal:     { sunSign: string; moonSign: string; risingSign: string; archetypeName: string };
   SaveYourReading:    undefined;
   OptionalQuestions:  undefined;
+  ChartPreparation:   undefined;
   PremiumTeaser:      undefined;
   // App
   MainTabs:      NavigatorScreenParams<TabParamList> | undefined;

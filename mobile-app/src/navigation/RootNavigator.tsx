@@ -14,7 +14,8 @@ import BirthTimeScreen     from '../screens/onboarding/BirthTimeScreen';
 import CalculatingScreen        from '../screens/onboarding/CalculatingScreen';
 import BigThreeRevealScreen     from '../screens/onboarding/BigThreeRevealScreen';
 import SaveYourReadingScreen    from '../screens/onboarding/SaveYourReadingScreen';
-import OptionalQuestionsScreen  from '../screens/onboarding/OptionalQuestionsScreen';
+import OptionalQuestionsScreen   from '../screens/onboarding/OptionalQuestionsScreen';
+import ChartPreparationScreen   from '../screens/onboarding/ChartPreparationScreen';
 import PremiumTeaserScreen      from '../screens/onboarding/PremiumTeaserScreen';
 
 // Stack-only screens (appear above the tab bar)
@@ -58,8 +59,9 @@ export const RootNavigator: React.FC = () => {
       <Stack.Screen name="Calculating"       component={CalculatingScreen}       options={{ animation: 'fade', gestureEnabled: false }} />
       <Stack.Screen name="BigThreeReveal"     component={BigThreeRevealScreen}     options={{ animation: 'fade', gestureEnabled: false }} />
       <Stack.Screen name="SaveYourReading"    component={SaveYourReadingScreen}    options={{ animation: 'fade', gestureEnabled: false }} />
-      <Stack.Screen name="OptionalQuestions"  component={OptionalQuestionsScreen} options={{ gestureEnabled: false }} />
-      <Stack.Screen name="PremiumTeaser"      component={PremiumTeaserScreen}      options={{ gestureEnabled: false }} />
+      <Stack.Screen name="OptionalQuestions"  component={OptionalQuestionsScreen}  options={{ gestureEnabled: false }} />
+      <Stack.Screen name="ChartPreparation"   component={ChartPreparationScreen}   options={{ animation: 'fade', gestureEnabled: false }} />
+      <Stack.Screen name="PremiumTeaser"      component={PremiumTeaserScreen}       options={{ gestureEnabled: false }} />
       <Stack.Screen name="MainTabs"      component={TabNavigator}        options={{ animation: 'none' }} />
       <Stack.Screen name="Calendar"      component={CalendarScreen} />
       <Stack.Screen name="Compatibility"     component={CompatibilityScreen} />

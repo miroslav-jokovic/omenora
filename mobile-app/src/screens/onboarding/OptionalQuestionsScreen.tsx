@@ -77,7 +77,7 @@ export default function OptionalQuestionsScreen() {
         if (val != null) setAnswer(q.id, val)
       }
     })
-    navigation.replace('PremiumTeaser')
+    navigation.replace('ChartPreparation')
   }
 
   const handleContinue = () => {
