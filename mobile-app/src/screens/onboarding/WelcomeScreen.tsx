@@ -41,11 +41,11 @@ const WELCOME_HEADLINE_TRANSITION = { type: 'timing' as const, duration: 800, de
 
 const WELCOME_SUBHEAD_FROM       = { opacity: 0, translateY: 12 } as const
 const WELCOME_SUBHEAD_ANIMATE    = { opacity: 1, translateY: 0  } as const
-const WELCOME_SUBHEAD_TRANSITION = { type: 'timing' as const, duration: 800, delay: 400 }
+const WELCOME_SUBHEAD_TRANSITION = { type: 'timing' as const, duration: 800, delay: 300 }
 
 const WELCOME_CTA_FROM       = { opacity: 0, translateY: 12 } as const
 const WELCOME_CTA_ANIMATE    = { opacity: 1, translateY: 0  } as const
-const WELCOME_CTA_TRANSITION = { type: 'timing' as const, duration: 800, delay: 600 }
+const WELCOME_CTA_TRANSITION = { type: 'timing' as const, duration: 800, delay: 400 }
 
 export default function WelcomeScreen() {
   const navigation  = useNavigation<WelcomeNavProp>()
@@ -151,20 +151,24 @@ export default function WelcomeScreen() {
                 <View testID="welcome-cta-primary">
                   <Button
                     label="Reveal my chart"
-                    variant="premium"
+                    variant="primary"
                     fullWidth
-                    onPress={() => navigation.navigate('Name')}
+                    onPress={() => { track('welcome_cta_tapped'); navigation.navigate('Name') }}
                   />
+                  <Text variant="caption" color="tertiary" style={styles.ctaMicrocopy}>
+                    Free · takes about a minute
+                  </Text>
                 </View>
 
                 <Pressable
                   testID="welcome-cta-signin"
-                  onPress={() =>
+                  onPress={() => {
+                    track('welcome_signin_tapped')
                     showAuthGate({
                       title: 'Welcome back',
                       body: 'Sign in to access your readings and profile.',
                     })
-                  }
+                  }}
                   style={({ pressed }: PressableStateCallbackType) => [
                     styles.signInTap,
                     pressed && styles.signInTapPressed,
@@ -245,6 +249,10 @@ const styles = StyleSheet.create({
   actions: {
     gap:          space['3'],
     marginBottom: space['4'],
+  },
+  ctaMicrocopy: {
+    textAlign:  'center',
+    marginTop: -space['1'],
   },
   signInTap: {
     flexDirection:  'row',
