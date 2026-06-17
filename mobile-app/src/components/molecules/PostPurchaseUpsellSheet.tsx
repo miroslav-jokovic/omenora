@@ -60,10 +60,25 @@ export const PostPurchaseUpsellSheet: React.FC<PostPurchaseUpsellSheetProps> = (
                 paid for goes away.
               </Text>
 
+              {/* Visual sum line */}
+              <View style={styles.sumRow}>
+                <View style={styles.sumChip}>
+                  <Text variant="label" color="primary">{n} bought</Text>
+                </View>
+                <Text variant="label" color="tertiary" style={styles.sumPlus}>+</Text>
+                <View style={styles.sumChip}>
+                  <Text variant="label" color="primary">30/month</Text>
+                </View>
+                <Text variant="label" color="tertiary" style={styles.sumPlus}>=</Text>
+                <View style={[styles.sumChip, styles.sumChipTotal]}>
+                  <Text variant="label" color="primary">{n + 30} total</Text>
+                </View>
+              </View>
+
               <View style={styles.actions}>
                 <Button
                   label="Upgrade to Premium"
-                  variant="premium"
+                  variant="cta"
                   fullWidth
                   onPress={onUpgrade}
                   style={styles.primaryButton}
@@ -108,4 +123,24 @@ const styles = StyleSheet.create({
     gap:       space['3'],
   },
   primaryButton: {},
+  sumRow: {
+    flexDirection:  'row',
+    alignItems:     'center',
+    flexWrap:       'wrap',
+    gap:            space['2'],
+    marginTop:      space['4'],
+    marginBottom:   space['2'],
+  },
+  sumChip: {
+    backgroundColor:   tokens.surface.overlay,
+    borderRadius:      radius.sm,
+    paddingHorizontal: space['3'],
+    paddingVertical:   space['1.5'],
+  },
+  sumChipTotal: {
+    backgroundColor: tokens.accent.subtle,
+  },
+  sumPlus: {
+    paddingHorizontal: space['1'],
+  },
 })

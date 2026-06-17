@@ -87,7 +87,7 @@ export default function CounselScreen({ navigation }: CounselScreenProps) {
                 <Button
                   label="Start chatting"
                   onPress={handleStartChat}
-                  variant="premium"
+                  variant="cta"
                   fullWidth
                 />
                 <Button

@@ -10,7 +10,7 @@ export const surface = {
 export const text = {
   primary:   '#F2EDE5',  // warm cream (web: --omn-text-primary)
   secondary: '#A8A19A',  // warm taupe (web: --omn-text-secondary)
-  tertiary:  '#6B655E',  // warm brown (web: --omn-text-tertiary)
+  tertiary:  '#8A8278',  // warm taupe — WCAG AA 4.94:1 on #121214 (was #6B655E, 3.25:1)
   disabled:  '#4A4A50',  // matches surface.floating — softest readable state
   inverse:   '#121214',  // page-color for text on light/CTA surfaces
   accent:    '#A87D4E',  // bronze — matches accent.primary for inline accent text

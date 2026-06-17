@@ -88,7 +88,7 @@ export const CompatibilityIAPSheet: React.FC<CompatibilityIAPSheetProps> = ({
                 <>
                   {/* ── Option A: Single reading ──────────────────── */}
                   <View style={styles.option}>
-                    <Text variant="micro" color="accent" style={styles.eyebrow}>ONE-TIME</Text>
+                    <Text variant="micro" style={[styles.eyebrow, styles.eyebrowColor]}>ONE-TIME</Text>
                     <Text variant="heading2" color="primary" style={styles.optionTitle}>
                       Single Compatibility Reading
                     </Text>
@@ -113,7 +113,7 @@ export const CompatibilityIAPSheet: React.FC<CompatibilityIAPSheetProps> = ({
 
                   {/* ── Option B: Upgrade to Premium ──────────────── */}
                   <View style={styles.option}>
-                    <Text variant="micro" color="accent" style={styles.eyebrow}>UNLIMITED</Text>
+                    <Text variant="micro" style={[styles.eyebrow, styles.eyebrowColor]}>UNLIMITED</Text>
                     <Text variant="heading2" color="primary" style={styles.optionTitle}>
                       OMENORA Premium
                     </Text>
@@ -172,6 +172,9 @@ const styles = StyleSheet.create({
   },
   eyebrow: {
     letterSpacing: 1.5,
+  },
+  eyebrowColor: {
+    color: tokens.accent.emphasis,
   },
   optionTitle: {
     marginTop: space['1'],

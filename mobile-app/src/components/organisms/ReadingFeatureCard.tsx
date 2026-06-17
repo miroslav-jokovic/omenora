@@ -57,7 +57,7 @@ export const ReadingFeatureCard: React.FC<ReadingFeatureCardProps> = ({
         </Text>
         <Button
           label={ctaLabel}
-          variant="premium"
+          variant="cta"
           fullWidth
           onPress={handleUnlockPress}
           style={styles.cta}

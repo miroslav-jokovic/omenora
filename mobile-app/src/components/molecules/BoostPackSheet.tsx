@@ -118,7 +118,7 @@ export const BoostPackSheet: React.FC<BoostPackSheetProps> = ({
                             variant="micro"
                             style={[
                               styles.eyebrow,
-                              { color: pack.recommended ? tokens.accent.emphasis : tokens.accent.primary },
+                              { color: tokens.accent.emphasis },
                             ]}
                           >
                             {pack.eyebrow}

@@ -19,6 +19,7 @@ import {
   layout,
   radius,
   typeScale,
+  warmGlow,
 } from '../../design/tokens'
 import { Text } from './Text'
 
@@ -177,6 +178,9 @@ export const Button: React.FC<ButtonProps> = ({
       style={({ pressed }) => [
         styles.base,
         vs.container,
+        variant === 'cta' && styles.ctaBase,
+        variant === 'cta' && warmGlow,
+        variant === 'cta' && pressed && { backgroundColor: ctaTokens.active },
         fullWidth && styles.fullWidth,
         (disabled || loading) && styles.disabled,
         pressed && styles.pressed,
@@ -191,7 +195,7 @@ export const Button: React.FC<ButtonProps> = ({
             <IconComponent size={16} color={vs.label.color} />
           )}
           <Text
-            variant="label"
+            variant={variant === 'cta' ? 'labelLarge' : 'label'}
             style={vs.label}
           >
             {label}
@@ -250,6 +254,14 @@ const styles = StyleSheet.create({
     borderRadius:      radius.md,
     alignItems:        'center',
     justifyContent:    'center',
+  },
+  // CTA variant — matches the `premium` button's physical prominence
+  // (minHeight 56, radius.sm, 16px vertical padding) so the warm purchase
+  // button reads as the loudest element. Pairs with warmGlow + labelLarge.
+  ctaBase: {
+    minHeight:       56,
+    paddingVertical: space['4'],
+    borderRadius:    radius.sm,
   },
   fullWidth: {
     width: '100%',

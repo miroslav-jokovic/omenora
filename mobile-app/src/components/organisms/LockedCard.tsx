@@ -3,7 +3,7 @@ import { StyleSheet, ViewStyle } from 'react-native'
 import * as Haptics from 'expo-haptics'
 import { Text, Button } from '../atoms'
 import { Card } from './Card'
-import { space } from '../../design/tokens'
+import { space, tokens } from '../../design/tokens'
 
 export interface LockedCardProps {
   /** Hero headline — lead with what the user gets */
@@ -33,7 +33,7 @@ export const LockedCard: React.FC<LockedCardProps> = ({
 
   return (
     <Card variant="premium" padding="premium" style={style}>
-      <Text variant="micro" color="accent" style={styles.eyebrow}>
+      <Text variant="micro" style={[styles.eyebrow, styles.eyebrowColor]}>
         PREMIUM
       </Text>
       <Text variant="display2" color="primary" style={styles.title}>
@@ -56,6 +56,9 @@ export const LockedCard: React.FC<LockedCardProps> = ({
 const styles = StyleSheet.create({
   eyebrow: {
     letterSpacing: 1.5,
+  },
+  eyebrowColor: {
+    color: tokens.accent.emphasis,
   },
   title: {
     marginTop: space['3'],
