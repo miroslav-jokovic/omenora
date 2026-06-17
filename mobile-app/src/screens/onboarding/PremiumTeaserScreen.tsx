@@ -41,10 +41,33 @@ export default function PremiumTeaserScreen() {
   const insets = useSafeAreaInsets()
 
   const archetype  = useProfileStore((s) => s.archetype)
+  const lifeFocusRaw = useProfileStore((s) => s.answers['life_focus'])
   const archetypeName =
     archetype != null && archetype.length > 0
       ? `The ${archetype.charAt(0).toUpperCase()}${archetype.slice(1)}`
       : 'Your Archetype'
+
+  // Map the first life_focus selection to an inline phrase.
+  // Values are the exact option values from OptionalQuestionsScreen QUESTIONS.
+  const LIFE_FOCUS_PHRASE: Record<string, string> = {
+    love:         'your love life',
+    career:       'your work decisions',
+    inner_growth: 'your inner growth',
+    spiritual:    'your spiritual path',
+    curiosity:    'your curiosity',
+  }
+
+  let focusPhrase: string | null = null
+  if (lifeFocusRaw != null) {
+    try {
+      const arr = JSON.parse(lifeFocusRaw)
+      if (Array.isArray(arr) && arr.length > 0 && typeof arr[0] === 'string') {
+        focusPhrase = LIFE_FOCUS_PHRASE[arr[0]] ?? null
+      }
+    } catch {
+      // unparseable — fall back to null
+    }
+  }
 
   const { isAnonymous, showAuthGate } = useAuth()
   const { presentPaywall }            = usePurchases()
@@ -126,7 +149,7 @@ export default function PremiumTeaserScreen() {
               </EditorialBenefit>
               <EditorialBenefit>
                 Inside: your full archetype portrait, every planet in your natal chart,
-                your 90-day forecast, daily guidance written for your chart — and Counsel,
+                your 90-day forecast,{focusPhrase != null ? ` daily guidance for ${focusPhrase}, written for your chart` : ' daily guidance written for your chart'} — and Counsel,
                 your AI astrologer, on call.
               </EditorialBenefit>
               <Text variant="caption" color="secondary" style={styles.trustLine}>
@@ -146,7 +169,7 @@ export default function PremiumTeaserScreen() {
           <View testID="paywall-cta-primary">
             <Button
               label="Open my reading"
-              variant="premium"
+              variant="cta"
               fullWidth
               onPress={handleUnlock}
             />
