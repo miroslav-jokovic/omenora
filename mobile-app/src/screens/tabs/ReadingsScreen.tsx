@@ -8,7 +8,7 @@ import {
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { Text, Chip, Button, ZodiacSymbol } from '../../components/atoms'
-import { Card, ReadingCard, TransitCard, SectionHeader, ReadingFeatureCard } from '../../components/organisms'
+import { Card, LockedCard, ReadingCard, TransitCard, SectionHeader, ReadingFeatureCard } from '../../components/organisms'
 import ReadingHero from '../../components/hero/ReadingHero'
 import { useProfileStore } from '../../stores/profileStore'
 import { usePurchases } from '../../context/usePurchases'
@@ -19,6 +19,7 @@ import { isPastDate } from '../../utils/time'
 import { tokens, space, layout } from '../../design/tokens'
 import { AtmosphericBackground } from '../../components/atmosphere'
 import type { ReadingsScreenProps } from '../../navigation/types'
+import { track } from '../../lib/analytics'
 
 // ── Section state (discriminated union) ───────────────────────────────────
 
@@ -41,7 +42,7 @@ const ARCHETYPE_SECTIONS = [
 
 // ── Component ─────────────────────────────────────────────────────────────
 
-export default function ReadingsScreen({ navigation: _navigation }: ReadingsScreenProps) {
+export default function ReadingsScreen({ navigation }: ReadingsScreenProps) {
   const firstName        = useProfileStore((s) => s.firstName)
   const dateOfBirth      = useProfileStore((s) => s.dateOfBirth)
   const lifePathNumber   = useProfileStore((s) => s.lifePathNumber)
@@ -307,7 +308,7 @@ export default function ReadingsScreen({ navigation: _navigation }: ReadingsScre
               )}
               {archetypeState.kind === 'error' && (
                 <Card variant="default" padding="default">
-                  <Text variant="body" color="tertiary">{archetypeState.message}</Text>
+                  <Text variant="body" color="secondary">{archetypeState.message}</Text>
                   {!archetypeState.message.includes('limit') && !archetypeState.message.includes('required') && (
                     <Text variant="body" color="accent" onPress={generateArchetypeReading} style={styles.retryLink}>
                       Try again.
@@ -395,7 +396,7 @@ export default function ReadingsScreen({ navigation: _navigation }: ReadingsScre
               )}
               {natalChartState.kind === 'error' && (
                 <Card variant="default" padding="default">
-                  <Text variant="body" color="tertiary">{natalChartState.message}</Text>
+                  <Text variant="body" color="secondary">{natalChartState.message}</Text>
                   {!natalChartState.message.includes('limit') && !natalChartState.message.includes('required') && (
                     <Text variant="body" color="accent" onPress={generateNatalChart} style={styles.retryLink}>
                       Try again.
@@ -516,7 +517,7 @@ export default function ReadingsScreen({ navigation: _navigation }: ReadingsScre
               )}
               {forecastState.kind === 'error' && (
                 <Card variant="default" padding="default">
-                  <Text variant="body" color="tertiary">{forecastState.message}</Text>
+                  <Text variant="body" color="secondary">{forecastState.message}</Text>
                   {!forecastState.message.includes('limit') && !forecastState.message.includes('required') && (
                     <Text variant="body" color="accent" onPress={generateForecast} style={styles.retryLink}>
                       Try again.
@@ -537,9 +538,8 @@ export default function ReadingsScreen({ navigation: _navigation }: ReadingsScre
                     {forecastStale && (
                       <Text
                         variant="caption"
-                        color="accent"
                         onPress={handleRegenerateForecast}
-                        style={styles.staleLink}
+                        style={[styles.staleLink, styles.staleLinkAccent]}
                       >
                         Generate a new forecast for the next 90 days.
                       </Text>
@@ -602,6 +602,18 @@ export default function ReadingsScreen({ navigation: _navigation }: ReadingsScre
             />
           )}
         </View>
+
+        {/* ── 7. Compatibility teaser — W4 funnel card (all users) ──────── */}
+        <LockedCard
+          placement="funnel_compatibility_readings"
+          title="Compatibility"
+          description="Full chart compatibility for two people — not a sun-sign match. See how your charts actually fit."
+          ctaLabel="Explore Compatibility"
+          onUnlockPress={() => {
+            track('explore_tapped', { feature: 'compatibility', source: 'readings_screen' })
+            navigation.navigate('Compatibility')
+          }}
+        />
 
         {/*
          * TODO (Phase 5): Daily insight history
@@ -702,6 +714,9 @@ const styles = StyleSheet.create({
   },
   staleLink: {
     marginTop: space['1'],
+  },
+  staleLinkAccent: {
+    color: tokens.accent.emphasis,
   },
   staleContent: {
     opacity: 0.65,

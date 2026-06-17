@@ -20,7 +20,7 @@ import { useAuth } from '../../context/useAuth'
 import { usePurchases } from '../../context/usePurchases'
 import api from '../../api/endpoints'
 import type { GetDailyCacheResponse } from '../../api/endpoints'
-import { tokens, space, layout } from '../../design/tokens'
+import { tokens, space, layout, radius } from '../../design/tokens'
 import type { TodayScreenProps } from '../../navigation/types'
 import { track } from '../../lib/analytics'
 
@@ -192,6 +192,26 @@ export default function TodayScreen({ navigation }: TodayScreenProps) {
           style={{ marginHorizontal: -layout.screenPadding }}
         />
 
+        {/* ── 1b. Unlock pill — persistent re-entry for free users (W5) ─── */}
+        {storeHydrated && !isPremium && (
+          <Pressable
+            onPress={() => {
+              track('premium_teaser_opened', { source: 'today_header_pill' })
+              navigation.navigate('PremiumTeaser')
+            }}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+            accessibilityRole="button"
+            accessibilityLabel={archetype ? `Unlock ${archetype.charAt(0).toUpperCase()}${archetype.slice(1)}` : 'Unlock Premium'}
+            style={styles.unlockPillWrapper}
+          >
+            <View style={styles.unlockPill}>
+              <Text variant="micro" style={styles.unlockPillText}>
+                {archetype ? `UNLOCK ${archetype.toUpperCase()}` : 'UNLOCK PREMIUM'}
+              </Text>
+            </View>
+          </Pressable>
+        )}
+
         {/* ── 2. Archetype insight — borderless, continuation of hero ──── */}
         <View style={styles.insightBlock}>
           <Text variant="caption" color="tertiary" style={[styles.sectionLabel, { textTransform: 'uppercase' }]}>
@@ -323,7 +343,7 @@ export default function TodayScreen({ navigation }: TodayScreenProps) {
             </Text>
             <Button
               label="Unlock Premium"
-              variant="premium"
+              variant="cta"
               fullWidth
               onPress={async () => { await presentPaywall('today_returning_user') }}
               style={styles.teaserCta}
@@ -350,6 +370,17 @@ export default function TodayScreen({ navigation }: TodayScreenProps) {
             onUnlockPress={async () => { await presentPaywall('today_dimensions') }}
           />
         )}
+        {/* ── 8b. Calendar teaser — W4 funnel card (all free users) ─── */}
+        {!isPremium && (
+          <LockedCard
+            placement="funnel_calendar_today"
+            title="2026 Lucky Timing Calendar"
+            description="Auspicious dates for love, work, money, and major decisions — all 12 months."
+            ctaLabel="View Calendar"
+            onUnlockPress={() => navigation.navigate('Calendar')}
+          />
+        )}
+
         {/* ── 9. Explore — surface the paid funnels for free users (MC-3) ─── */}
         {!isPremium && (
           <Card variant="content" padding="compact">
@@ -426,5 +457,20 @@ const styles = StyleSheet.create({
   },
   teaserCta: {
     marginTop: space['4'],
+  },
+  unlockPillWrapper: {
+    alignSelf: 'center',
+    minHeight: layout.tapTarget,
+    justifyContent: 'center',
+  },
+  unlockPill: {
+    borderWidth: 1,
+    borderColor: tokens.border.accent,
+    borderRadius: radius.pill,
+    paddingHorizontal: space['3'],
+    paddingVertical: space['1.5'],
+  },
+  unlockPillText: {
+    color: tokens.accent.emphasis,
   },
 })
